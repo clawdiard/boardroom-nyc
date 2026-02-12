@@ -119,6 +119,9 @@ const lastUpdated = products.reduce((latest, p) => {
               category={p.category}
               href={p.url || `${base}shops/${p.shop_slug}/`}
               soldOut={!p.in_stock}
+              reserved={p.status === 'reserved'}
+              productId={p.id}
+              shopSlug={p.shop_slug}
             />
             <span class="product-item__shop">{p.shop_slug.replace(/-/g, ' ')}</span>
           </div>

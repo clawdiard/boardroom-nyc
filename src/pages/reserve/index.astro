@@ -1,0 +1,222 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { loadAllProducts, formatPrice } from '../../utils/products';
+
+const products = loadAllProducts();
+// Build a lookup map for client-side use
+const productMap = Object.fromEntries(products.map(p => [`${p.shop_slug}/${p.id}`, { name: p.name, brand: p.brand, price: p.price, shop_slug: p.shop_slug, in_stock: p.in_stock, status: p.status || 'available' }]));
+---
+
+<Layout title="Reserve for Pickup — Board Room NYC" description="Reserve skate gear for in-store pickup with a 24-hour hold.">
+  <main class="reserve-page">
+    <a href="/products/" class="back-link">← Back to Catalog</a>
+
+    <h1>🛒 Reserve for Pickup</h1>
+    <p class="reserve-page__subtitle">Reserve your gear and pick it up within 24 hours. No payment needed — just show up!</p>
+
+    <div id="product-info" class="reserve-page__product" style="display:none;">
+      <div class="product-summary">
+        <span class="product-summary__brand" id="p-brand"></span>
+        <h2 class="product-summary__name" id="p-name"></h2>
+        <span class="product-summary__price" id="p-price"></span>
+        <span class="product-summary__shop" id="p-shop"></span>
+      </div>
+    </div>
+
+    <div id="error-msg" class="reserve-page__error" style="display:none;">
+      <p>⚠️ This product is not available for reservation.</p>
+      <a href="/products/">Browse available products</a>
+    </div>
+
+    <form
+      id="reserve-form"
+      action="https://formspree.io/f/xreserve"
+      method="POST"
+      class="reserve-form"
+      style="display:none;"
+    >
+      <input type="hidden" name="product_id" id="f-product-id" />
+      <input type="hidden" name="shop_slug" id="f-shop-slug" />
+      <input type="hidden" name="product_name" id="f-product-name" />
+
+      <div class="form-group">
+        <label for="f-name">Your Name *</label>
+        <input type="text" id="f-name" name="customer_name" required autocomplete="name" />
+      </div>
+
+      <div class="form-group">
+        <label for="f-email">Email *</label>
+        <input type="email" id="f-email" name="customer_email" required autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label for="f-phone">Phone</label>
+        <input type="tel" id="f-phone" name="customer_phone" autocomplete="tel" />
+      </div>
+
+      <button type="submit" class="reserve-form__submit">Reserve — 24hr Hold</button>
+      <p class="reserve-form__note">Your reservation will be held for 24 hours. Pick up at the shop or it will be released.</p>
+    </form>
+
+    <div id="success-msg" class="reserve-page__success" style="display:none;">
+      <h2>✅ Reserved!</h2>
+      <p>You'll receive a confirmation email shortly. Head to the shop within 24 hours to pick up your gear.</p>
+      <a href="/products/">Continue browsing</a>
+    </div>
+  </main>
+
+  <script define:vars={{ productMap }}>
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('product');
+    const shopSlug = params.get('shop');
+    const key = `${shopSlug}/${productId}`;
+    const product = productMap[key];
+
+    const productInfo = document.getElementById('product-info');
+    const errorMsg = document.getElementById('error-msg');
+    const form = document.getElementById('reserve-form');
+    const successMsg = document.getElementById('success-msg');
+
+    if (product && product.in_stock && product.status !== 'reserved') {
+      // Show product info and form
+      document.getElementById('p-brand').textContent = product.brand;
+      document.getElementById('p-name').textContent = product.name;
+      document.getElementById('p-price').textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(product.price);
+      document.getElementById('p-shop').textContent = product.shop_slug.replace(/-/g, ' ');
+
+      document.getElementById('f-product-id').value = productId;
+      document.getElementById('f-shop-slug').value = shopSlug;
+      document.getElementById('f-product-name').value = product.name;
+
+      productInfo.style.display = '';
+      form.style.display = '';
+    } else {
+      errorMsg.style.display = '';
+    }
+
+    // Handle form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+          form.style.display = 'none';
+          successMsg.style.display = '';
+        } else {
+          alert('Something went wrong. Please try again.');
+        }
+      } catch {
+        alert('Network error. Please try again.');
+      }
+    });
+  </script>
+</Layout>
+
+<style>
+  .reserve-page {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--space-4);
+  }
+  .back-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: var(--text-sm);
+  }
+  .back-link:hover { color: var(--color-grip-yellow); }
+
+  .reserve-page h1 { margin-top: var(--space-4); }
+  .reserve-page__subtitle { color: var(--text-muted); margin-bottom: var(--space-6); }
+
+  .product-summary {
+    background: var(--surface-card, #1a1a1a);
+    border: 2px solid var(--color-gray-700, #333);
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+  .product-summary__brand {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+  .product-summary__name {
+    margin: var(--space-1) 0;
+    font-family: var(--font-display, monospace);
+  }
+  .product-summary__price {
+    font-weight: 700;
+    color: var(--color-grip-yellow, #f0c040);
+    font-size: var(--text-lg);
+  }
+  .product-summary__shop {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    text-transform: capitalize;
+    margin-top: var(--space-2);
+  }
+
+  .reserve-form { display: flex; flex-direction: column; gap: var(--space-4); }
+  .form-group { display: flex; flex-direction: column; gap: var(--space-1); }
+  .form-group label {
+    font-family: var(--font-display, monospace);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+  }
+  .form-group input {
+    padding: var(--space-3);
+    background: var(--surface-card, #1a1a1a);
+    border: 2px solid var(--color-gray-700, #333);
+    color: var(--text-primary, #fff);
+    font-size: var(--text-md);
+    font-family: inherit;
+  }
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--color-grip-yellow, #f0c040);
+  }
+
+  .reserve-form__submit {
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-grip-yellow, #f0c040);
+    color: #111;
+    font-family: var(--font-display, monospace);
+    font-weight: 700;
+    font-size: var(--text-md);
+    text-transform: uppercase;
+    border: 2px solid var(--color-grip-yellow, #f0c040);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .reserve-form__submit:hover {
+    background: transparent;
+    color: var(--color-grip-yellow, #f0c040);
+  }
+  .reserve-form__note {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .reserve-page__error {
+    background: #2a1a1a;
+    border: 2px solid #c44;
+    padding: var(--space-4);
+    text-align: center;
+  }
+  .reserve-page__error a { color: var(--color-grip-yellow); }
+
+  .reserve-page__success {
+    background: #1a2a1a;
+    border: 2px solid #4c4;
+    padding: var(--space-6);
+    text-align: center;
+  }
+  .reserve-page__success a { color: var(--color-grip-yellow); }
+</style>

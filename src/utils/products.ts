@@ -17,6 +17,8 @@ export interface Product {
   url?: string;
   tags?: string[];
   last_updated: string;
+  status?: 'available' | 'reserved';
+  reserved_at?: string;
 }
 
 let _cache: Product[] | null = null;

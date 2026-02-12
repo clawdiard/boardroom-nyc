@@ -7,12 +7,18 @@ interface Props {
   category?: string;
   href?: string;
   soldOut?: boolean;
+  reserved?: boolean;
+  productId?: string;
+  shopSlug?: string;
 }
 
-const { name, price, image, brand, category, href, soldOut = false } = Astro.props;
+const { name, price, image, brand, category, href, soldOut = false, reserved = false, productId, shopSlug } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const canReserve = !soldOut && !reserved && productId && shopSlug;
+const reserveHref = canReserve ? `${base}reserve/?product=${productId}&shop=${shopSlug}` : undefined;
 ---
 
-<a class:list={['product-card', { 'product-card--sold-out': soldOut }]} href={href || '#'}>
+<a class:list={['product-card', { 'product-card--sold-out': soldOut, 'product-card--reserved': reserved }]} href={href || '#'}>
   <div class="product-card__image">
     {image ? (
       <img src={image} alt={name} loading="lazy" />
@@ -20,6 +26,7 @@ const { name, price, image, brand, category, href, soldOut = false } = Astro.pro
       <div class="product-card__placeholder">📦</div>
     )}
     {soldOut && <span class="product-card__badge">Sold Out</span>}
+    {reserved && <span class="product-card__badge product-card__badge--reserved">Reserved</span>}
   </div>
   <div class="product-card__body">
     {brand && <span class="product-card__brand">{brand}</span>}
@@ -28,6 +35,9 @@ const { name, price, image, brand, category, href, soldOut = false } = Astro.pro
     {category && <span class="product-card__cat">{category}</span>}
   </div>
 </a>
+{canReserve && (
+  <a class="reserve-btn" href={reserveHref}>🛒 Reserve for Pickup</a>
+)}
 
 <style>
   .product-card {
@@ -46,6 +56,7 @@ const { name, price, image, brand, category, href, soldOut = false } = Astro.pro
     box-shadow: none;
   }
   .product-card--sold-out { opacity: 0.6; }
+  .product-card--reserved { opacity: 0.8; }
 
   .product-card__image {
     position: relative;
@@ -63,43 +74,69 @@ const { name, price, image, brand, category, href, soldOut = false } = Astro.pro
     align-items: center;
     justify-content: center;
     height: 100%;
-    font-size: var(--text-2xl);
-    opacity: 0.3;
+    font-size: 2.5rem;
+    opacity: 0.4;
   }
   .product-card__badge {
     position: absolute;
-    top: var(--space-2);
-    left: var(--space-2);
-    background: var(--color-error);
-    color: var(--color-white);
-    font-family: var(--font-display);
-    font-size: var(--text-xs);
+    top: var(--space-2, 8px);
+    right: var(--space-2, 8px);
+    background: var(--color-gray-900, #111);
+    color: var(--text-primary, #fff);
+    font-size: var(--text-xs, 0.75rem);
+    font-family: var(--font-display, monospace);
+    padding: var(--space-1, 4px) var(--space-2, 8px);
     text-transform: uppercase;
-    padding: var(--space-1) var(--space-2);
+    font-weight: 700;
   }
-
-  .product-card__body { padding: var(--space-3); }
+  .product-card__badge--reserved {
+    background: var(--color-grip-yellow, #f0c040);
+    color: #111;
+  }
+  .product-card__body {
+    padding: var(--space-3, 12px);
+  }
   .product-card__brand {
-    font-size: var(--text-xs);
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--text-muted, #999);
     text-transform: uppercase;
-    letter-spacing: var(--tracking-wide);
-    color: var(--text-muted);
+    letter-spacing: 0.05em;
   }
   .product-card__name {
-    font-family: var(--font-display);
-    font-size: var(--text-base);
-    text-transform: uppercase;
-    margin: var(--space-1) 0;
+    margin: var(--space-1, 4px) 0;
+    font-size: var(--text-md, 1rem);
+    font-family: var(--font-display, monospace);
+    line-height: 1.3;
   }
   .product-card__price {
-    font-family: var(--font-display);
-    font-size: var(--text-md);
-    color: var(--color-grip-yellow);
+    font-weight: 700;
+    color: var(--color-grip-yellow, #f0c040);
   }
   .product-card__cat {
     display: block;
-    font-size: var(--text-xs);
-    color: var(--text-muted);
-    margin-top: var(--space-1);
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--text-muted, #999);
+    text-transform: capitalize;
+    margin-top: var(--space-1, 4px);
+  }
+
+  .reserve-btn {
+    display: block;
+    text-align: center;
+    padding: var(--space-2, 8px) var(--space-3, 12px);
+    background: var(--color-grip-yellow, #f0c040);
+    color: #111;
+    font-family: var(--font-display, monospace);
+    font-weight: 700;
+    font-size: var(--text-sm, 0.875rem);
+    text-decoration: none;
+    text-transform: uppercase;
+    border: 2px solid var(--color-grip-yellow, #f0c040);
+    transition: all 0.15s ease;
+    margin-top: 2px;
+  }
+  .reserve-btn:hover {
+    background: transparent;
+    color: var(--color-grip-yellow, #f0c040);
   }
 </style>
