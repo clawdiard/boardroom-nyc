@@ -1,0 +1,111 @@
+---
+export interface Props {
+  slug: string;
+  shopName: string;
+}
+
+const { slug, shopName } = Astro.props;
+---
+
+<section class="reviews-section">
+  <div class="reviews-header">
+    <h2>Community Reviews</h2>
+    <p class="reviews-guidelines">
+      Share your experience at {shopName}! Please keep reviews respectful and helpful.
+      Rate the shop, share what you bought, or describe the vibe. 
+      <strong>Sign in with GitHub to comment.</strong>
+    </p>
+    <div class="guidelines-box">
+      <h4>📋 Community Guidelines</h4>
+      <ul>
+        <li>Be respectful and constructive</li>
+        <li>Share honest, first-hand experiences</li>
+        <li>No spam, self-promotion, or hate speech</li>
+        <li>Support local — we're all in this together 🛹</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="giscus-wrapper">
+    <script
+      src="https://giscus.app/client.js"
+      data-repo="clawdiard/boardroom-nyc"
+      data-repo-id="R_kgDOROUduw"
+      data-category="General"
+      data-category-id="DIC_kwDOROUdu84C2RLF"
+      data-mapping="specific"
+      data-term={`shop-review-${slug}`}
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="top"
+      data-theme="dark_dimmed"
+      data-lang="en"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async
+    ></script>
+  </div>
+</section>
+
+<style>
+  .reviews-section {
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 2px solid var(--color-gray-700);
+  }
+
+  .reviews-header {
+    margin-bottom: var(--space-5);
+  }
+
+  .reviews-header h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    text-transform: uppercase;
+    margin: 0 0 var(--space-3);
+    color: var(--text-primary);
+  }
+
+  .reviews-guidelines {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 var(--space-4);
+  }
+
+  .guidelines-box {
+    background: var(--surface-card);
+    border: 1px solid var(--color-gray-700);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .guidelines-box h4 {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    margin: 0 0 var(--space-2);
+    color: var(--color-crimson);
+  }
+
+  .guidelines-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .guidelines-box li {
+    color: var(--text-muted);
+    padding: var(--space-1) 0;
+  }
+
+  .guidelines-box li::before {
+    content: '→ ';
+    color: var(--color-crimson);
+  }
+
+  .giscus-wrapper {
+    min-height: 200px;
+  }
+</style>

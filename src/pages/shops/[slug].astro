@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Badge from '../../components/Badge.astro';
+import Giscus from '../../components/Giscus.astro';
 import { isShopOpen } from '../../utils/shops.ts';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -148,6 +149,8 @@ const structuredData = {
         </div>
       </aside>
     </div>
+
+    <Giscus slug={shop.slug} shopName={shop.name} />
   </main>
 </Layout>
 
