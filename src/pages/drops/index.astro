@@ -1,0 +1,208 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const dropsRaw = readFileSync(resolve(process.cwd(), 'data/drops/drops.json'), 'utf-8');
+const allDrops = JSON.parse(dropsRaw);
+
+// Load shop data for linking
+const shopDir = resolve(process.cwd(), 'data/shops');
+const shopMap: Record<string, any> = {};
+try {
+  const fs = await import('node:fs');
+  for (const file of fs.readdirSync(shopDir)) {
+    if (file.endsWith('.json')) {
+      const shop = JSON.parse(fs.readFileSync(resolve(shopDir, file), 'utf-8'));
+      shopMap[shop.slug] = shop;
+    }
+  }
+} catch {}
+
+const now = new Date();
+const upcoming = allDrops
+  .filter((d: any) => new Date(d.date) >= now)
+  .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+const past = allDrops
+  .filter((d: any) => new Date(d.date) < now)
+  .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+---
+
+<Layout title="Drop Calendar — Board Room NYC" description="Upcoming product drops, collaborations, and shop exclusives across NYC skate shops." currentPath="/boardroom-nyc/drops/">
+  <section class="drops-hero">
+    <div class="container">
+      <h1>🔥 Drop Calendar</h1>
+      <p class="drops-hero__sub">Upcoming releases, exclusives & collabs from NYC skate shops</p>
+    </div>
+  </section>
+
+  <section class="drops-filters">
+    <div class="container">
+      <div class="drops-filters__row" id="filterRow">
+        <label class="drops-filter">
+          <span>Shop</span>
+          <select id="filterShop">
+            <option value="">All Shops</option>
+            {[...new Set(allDrops.filter((d: any) => d.shop).map((d: any) => d.shop))].map((slug: any) => (
+              <option value={slug}>{shopMap[slug]?.name || slug}</option>
+            ))}
+          </select>
+        </label>
+        <label class="drops-filter">
+          <span>Brand</span>
+          <select id="filterBrand">
+            <option value="">All Brands</option>
+            {[...new Set(allDrops.map((d: any) => d.brand))].sort().map((brand: any) => (
+              <option value={brand}>{brand}</option>
+            ))}
+          </select>
+        </label>
+        <label class="drops-filter">
+          <span class="drops-filter__check">
+            <input type="checkbox" id="filterExclusive" />
+            Exclusives only
+          </span>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <section class="drops-section">
+    <div class="container">
+      {upcoming.length > 0 && (
+        <>
+          <h2 class="drops-section__heading">Upcoming Drops</h2>
+          <div class="drops-grid" id="upcomingGrid">
+            {upcoming.map((drop: any) => (
+              <div class="drop-card drop-card--upcoming" data-shop={drop.shop || ''} data-brand={drop.brand} data-exclusive={drop.exclusive}>
+                <div class="drop-card__date">
+                  <span class="drop-card__month">{new Date(drop.date).toLocaleString('en-US', { month: 'short' })}</span>
+                  <span class="drop-card__day">{new Date(drop.date).getDate()}</span>
+                </div>
+                <div class="drop-card__body">
+                  <div class="drop-card__tags">
+                    {drop.exclusive && <span class="drop-tag drop-tag--exclusive">🏷️ Exclusive</span>}
+                    <span class="drop-tag">{drop.brand}</span>
+                  </div>
+                  <h3 class="drop-card__name">{drop.name}</h3>
+                  <p class="drop-card__desc">{drop.description}</p>
+                  <div class="drop-card__footer">
+                    {drop.shop && shopMap[drop.shop] && (
+                      <a href={`/boardroom-nyc/shops/${drop.shop}/`} class="drop-card__shop">📍 {shopMap[drop.shop].name}</a>
+                    )}
+                    {drop.link && <a href={drop.link} class="drop-card__link" target="_blank" rel="noopener">More Info →</a>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {past.length > 0 && (
+        <>
+          <h2 class="drops-section__heading drops-section__heading--past">Past Drops</h2>
+          <div class="drops-grid drops-grid--past" id="pastGrid">
+            {past.map((drop: any) => (
+              <div class="drop-card drop-card--past" data-shop={drop.shop || ''} data-brand={drop.brand} data-exclusive={drop.exclusive}>
+                <div class="drop-card__date">
+                  <span class="drop-card__month">{new Date(drop.date).toLocaleString('en-US', { month: 'short' })}</span>
+                  <span class="drop-card__day">{new Date(drop.date).getDate()}</span>
+                </div>
+                <div class="drop-card__body">
+                  <div class="drop-card__tags">
+                    {drop.exclusive && <span class="drop-tag drop-tag--exclusive">🏷️ Exclusive</span>}
+                    <span class="drop-tag">{drop.brand}</span>
+                  </div>
+                  <h3 class="drop-card__name">{drop.name}</h3>
+                  <p class="drop-card__desc">{drop.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {upcoming.length === 0 && past.length === 0 && (
+        <p class="drops-empty">No drops scheduled yet. Check back soon!</p>
+      )}
+    </div>
+  </section>
+
+  <script>
+    const shopFilter = document.getElementById('filterShop') as HTMLSelectElement;
+    const brandFilter = document.getElementById('filterBrand') as HTMLSelectElement;
+    const exclFilter = document.getElementById('filterExclusive') as HTMLInputElement;
+
+    function applyFilters() {
+      const shop = shopFilter.value;
+      const brand = brandFilter.value;
+      const exclOnly = exclFilter.checked;
+
+      document.querySelectorAll('.drop-card').forEach(card => {
+        const el = card as HTMLElement;
+        const matchShop = !shop || el.dataset.shop === shop;
+        const matchBrand = !brand || el.dataset.brand === brand;
+        const matchExcl = !exclOnly || el.dataset.exclusive === 'true';
+        el.style.display = (matchShop && matchBrand && matchExcl) ? '' : 'none';
+      });
+    }
+
+    shopFilter.addEventListener('change', applyFilters);
+    brandFilter.addEventListener('change', applyFilters);
+    exclFilter.addEventListener('change', applyFilters);
+  </script>
+</Layout>
+
+<style>
+  .drops-hero {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+  }
+  .drops-hero h1 { font-size: 2.5rem; margin: 0; }
+  .drops-hero__sub { color: #aaa; margin-top: .5rem; font-size: 1.1rem; }
+
+  .drops-filters { padding: 1.5rem 1rem; background: #111; border-bottom: 1px solid #222; }
+  .drops-filters__row { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+  .drops-filter { display: flex; flex-direction: column; gap: .3rem; color: #aaa; font-size: .85rem; }
+  .drops-filter select {
+    background: #1a1a2e; color: #fff; border: 1px solid #333; border-radius: 6px;
+    padding: .4rem .6rem; font-size: .9rem;
+  }
+  .drops-filter__check { display: flex; align-items: center; gap: .4rem; cursor: pointer; }
+  .drops-filter__check input { accent-color: #e74c3c; }
+
+  .drops-section { padding: 2rem 1rem; }
+  .drops-section__heading { font-size: 1.5rem; margin-bottom: 1rem; color: #fff; }
+  .drops-section__heading--past { color: #777; margin-top: 2.5rem; }
+
+  .drops-grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .drops-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .drop-card {
+    display: flex; gap: 1rem; padding: 1.2rem; border-radius: 10px;
+    background: #1a1a2e; border: 1px solid #2a2a4e; transition: border-color .2s;
+  }
+  .drop-card:hover { border-color: #e74c3c; }
+  .drop-card--past { opacity: .55; }
+
+  .drop-card__date { text-align: center; min-width: 50px; flex-shrink: 0; }
+  .drop-card__month { display: block; font-size: .75rem; text-transform: uppercase; color: #e74c3c; font-weight: 700; }
+  .drop-card__day { display: block; font-size: 1.6rem; font-weight: 800; color: #fff; }
+
+  .drop-card__body { flex: 1; }
+  .drop-card__tags { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .4rem; }
+  .drop-tag { font-size: .7rem; padding: .15rem .5rem; border-radius: 4px; background: #2a2a4e; color: #aaa; }
+  .drop-tag--exclusive { background: #e74c3c22; color: #e74c3c; }
+  .drop-card__name { font-size: 1.05rem; margin: 0 0 .3rem; color: #fff; }
+  .drop-card__desc { font-size: .85rem; color: #999; margin: 0 0 .5rem; }
+  .drop-card__footer { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .drop-card__shop, .drop-card__link { font-size: .8rem; color: #e74c3c; text-decoration: none; }
+  .drop-card__shop:hover, .drop-card__link:hover { text-decoration: underline; }
+
+  .drops-empty { color: #666; text-align: center; padding: 3rem 0; font-size: 1.1rem; }
+
+  .container { max-width: 900px; margin: 0 auto; }
+</style>

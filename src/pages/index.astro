@@ -114,6 +114,47 @@ const botwShop = featuredShops.find((s: any) => s.slug === homepage.board_of_the
     </div>
   </section>
 
+  <!-- UPCOMING DROPS -->
+  {(() => {
+    const dropsRaw = readFileSync(resolve(process.cwd(), 'data/drops/drops.json'), 'utf-8');
+    const allDrops = JSON.parse(dropsRaw);
+    const now = new Date();
+    const upcoming = allDrops
+      .filter((d: any) => new Date(d.date) >= now)
+      .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(0, 3);
+    return upcoming.length > 0 ? upcoming : null;
+  })() && (
+    <section class="upcoming-drops">
+      <div class="container">
+        <h2 class="section-title">🔥 Upcoming Drops</h2>
+        <div class="drops-preview">
+          {(() => {
+            const dropsRaw2 = readFileSync(resolve(process.cwd(), 'data/drops/drops.json'), 'utf-8');
+            const allDrops2 = JSON.parse(dropsRaw2);
+            const now2 = new Date();
+            return allDrops2
+              .filter((d: any) => new Date(d.date) >= now2)
+              .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
+              .slice(0, 3);
+          })().map((drop: any) => (
+            <div class="drop-preview-card">
+              <div class="drop-preview-card__date">
+                <span class="drop-preview__month">{new Date(drop.date).toLocaleString('en-US', { month: 'short' })}</span>
+                <span class="drop-preview__day">{new Date(drop.date).getDate()}</span>
+              </div>
+              <div>
+                <h3 class="drop-preview__name">{drop.name}</h3>
+                <p class="drop-preview__brand">{drop.brand}{drop.exclusive ? ' · 🏷️ Exclusive' : ''}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <a href="/boardroom-nyc/drops/" class="btn btn-secondary" style="margin-top:1rem;display:inline-block;">View All Drops →</a>
+      </div>
+    </section>
+  )}
+
   <!-- ABOUT -->
   <section class="about">
     <div class="container">
@@ -471,6 +512,19 @@ const botwShop = featuredShops.find((s: any) => s.slug === homepage.board_of_the
     line-height: var(--leading-relaxed);
     margin: 0 0 var(--space-5);
   }
+
+  /* ---- UPCOMING DROPS ---- */
+  .upcoming-drops { padding: 3rem 1rem; background: #111; }
+  .drops-preview { display: flex; flex-direction: column; gap: .75rem; }
+  .drop-preview-card {
+    display: flex; align-items: center; gap: 1rem; padding: 1rem;
+    background: #1a1a2e; border-radius: 8px; border: 1px solid #2a2a4e;
+  }
+  .drop-preview-card__date { text-align: center; min-width: 48px; }
+  .drop-preview__month { display: block; font-size: .7rem; text-transform: uppercase; color: #e74c3c; font-weight: 700; }
+  .drop-preview__day { display: block; font-size: 1.4rem; font-weight: 800; color: #fff; }
+  .drop-preview__name { font-size: 1rem; margin: 0; color: #fff; }
+  .drop-preview__brand { font-size: .8rem; color: #888; margin: .2rem 0 0; }
 
   /* ---- ABOUT ---- */
   .about {

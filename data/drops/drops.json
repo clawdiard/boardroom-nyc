@@ -1,0 +1,68 @@
+[
+  {
+    "id": "labor-spring-2026-deck-series",
+    "name": "Labor Spring 2026 Deck Series",
+    "date": "2026-03-01",
+    "brand": "Labor Skateboards",
+    "shop": "labor-skateshop",
+    "description": "Four new deck graphics celebrating NYC subway art. Limited run of 100 per graphic. In-store and online at midnight.",
+    "image": null,
+    "link": null,
+    "exclusive": true
+  },
+  {
+    "id": "homage-x-nike-sb-dunk",
+    "name": "Homage × Nike SB Dunk Low 'BK Bridge'",
+    "date": "2026-03-15",
+    "brand": "Nike SB",
+    "shop": "homage-brooklyn",
+    "description": "Brooklyn-exclusive colorway of the Nike SB Dunk Low. Inspired by the Brooklyn Bridge with premium suede and sail laces.",
+    "image": null,
+    "link": null,
+    "exclusive": true
+  },
+  {
+    "id": "spitfire-formula-four-neon",
+    "name": "Spitfire Formula Four Neon Pack",
+    "date": "2026-02-20",
+    "brand": "Spitfire",
+    "shop": null,
+    "description": "New neon colorways for the classic Formula Four 99A. Available at all participating NYC shops.",
+    "image": null,
+    "link": "https://spitfirewheels.com",
+    "exclusive": false
+  },
+  {
+    "id": "uncle-funkys-40th-anniversary",
+    "name": "Uncle Funky's 40th Anniversary Collection",
+    "date": "2026-04-12",
+    "brand": "Uncle Funky's",
+    "shop": "uncle-funkys-boards",
+    "description": "Limited anniversary decks, tees, and hats celebrating 40 years of Uncle Funky's Boards in Greenwich Village.",
+    "image": null,
+    "link": null,
+    "exclusive": true
+  },
+  {
+    "id": "palace-spring-drop-1",
+    "name": "Palace Spring 2026 Drop 1",
+    "date": "2026-02-28",
+    "brand": "Palace Skateboards",
+    "shop": null,
+    "description": "First spring drop featuring new Tri-Ferg decks, outerwear, and accessories. Online 11AM EST, in-store at Palace NYC.",
+    "image": null,
+    "link": "https://palaceskateboards.com",
+    "exclusive": false
+  },
+  {
+    "id": "homage-shop-deck-restock",
+    "name": "Homage Brooklyn Shop Deck Restock",
+    "date": "2026-02-14",
+    "brand": "Homage",
+    "shop": "homage-brooklyn",
+    "description": "Fan-favorite shop decks back in stock — including the sold-out Prospect Park graphic. First come, first served.",
+    "image": null,
+    "link": null,
+    "exclusive": true
+  }
+]
