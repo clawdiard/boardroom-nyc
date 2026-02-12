@@ -1,0 +1,93 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="footer__inner container">
+    <div class="footer__brand">
+      <span class="footer__logo">🛹 Board Room NYC</span>
+      <p class="footer__tagline">Your guide to NYC's skateboard scene.</p>
+    </div>
+    <div class="footer__links">
+      <div class="footer__col">
+        <h5 class="footer__heading">Explore</h5>
+        <a href="/boardroom-nyc/">Home</a>
+        <a href="/boardroom-nyc/shops/">Shops</a>
+        <a href="/boardroom-nyc/map/">Map</a>
+        <a href="/boardroom-nyc/catalog/">Catalog</a>
+      </div>
+      <div class="footer__col">
+        <h5 class="footer__heading">Community</h5>
+        <a href="/boardroom-nyc/about/">About</a>
+        <a href="https://github.com/clawdiard/boardroom-nyc">GitHub</a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>&copy; {year} Board Room NYC. Built with grit.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: auto;
+    background: var(--color-black);
+    border-top: 2px solid var(--color-gray-700);
+    padding: var(--space-8) 0 var(--space-6);
+  }
+  .footer__inner {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .footer__logo {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+  .footer__tagline {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin-top: var(--space-2);
+  }
+  .footer__links {
+    display: flex;
+    gap: var(--space-8);
+  }
+  .footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .footer__heading {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+    color: var(--color-crimson);
+    margin-bottom: var(--space-1);
+  }
+  .footer__col a {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+  .footer__col a:hover { color: var(--color-crimson); }
+  .footer__bottom {
+    border-top: 1px solid var(--color-gray-700);
+    padding-top: var(--space-4);
+  }
+  .footer__bottom p {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    .footer__inner {
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
+    }
+    .footer__bottom { grid-column: 1 / -1; }
+  }
+</style>

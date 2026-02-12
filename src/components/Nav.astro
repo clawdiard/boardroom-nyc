@@ -1,0 +1,152 @@
+---
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = '/' } = Astro.props;
+
+const links = [
+  { href: '/boardroom-nyc/', label: 'Home' },
+  { href: '/boardroom-nyc/shops/', label: 'Shops' },
+  { href: '/boardroom-nyc/map/', label: 'Map' },
+  { href: '/boardroom-nyc/catalog/', label: 'Catalog' },
+  { href: '/boardroom-nyc/about/', label: 'About' },
+];
+---
+
+<nav class="nav">
+  <div class="nav__inner container">
+    <a href="/boardroom-nyc/" class="nav__logo">
+      <span class="nav__logo-icon">🛹</span>
+      <span class="nav__logo-text">Board Room<br/><small>NYC</small></span>
+    </a>
+    <button class="nav__toggle" aria-label="Toggle menu" id="nav-toggle">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav__links" id="nav-links">
+      {links.map(link => (
+        <li>
+          <a
+            href={link.href}
+            class:list={['nav__link', { 'nav__link--active': currentPath === link.href }]}
+          >
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</nav>
+
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const links = document.getElementById('nav-links');
+  toggle?.addEventListener('click', () => {
+    links?.classList.toggle('nav__links--open');
+    toggle.classList.toggle('nav__toggle--open');
+  });
+</script>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--color-midnight);
+    border-bottom: 2px solid var(--color-crimson);
+  }
+  .nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-3);
+  }
+  .nav__logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    text-decoration: none;
+    color: var(--text-primary);
+  }
+  .nav__logo-icon { font-size: var(--text-xl); }
+  .nav__logo-text {
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    line-height: 1;
+  }
+  .nav__logo-text small {
+    font-size: var(--text-xs);
+    color: var(--color-crimson);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .nav__links {
+    display: none;
+    list-style: none;
+    gap: var(--space-1);
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-midnight);
+    border-bottom: 2px solid var(--color-crimson);
+    padding: var(--space-4);
+  }
+  .nav__links--open { display: flex; }
+
+  .nav__link {
+    display: block;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    padding: var(--space-2) var(--space-3);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+  .nav__link:hover { color: var(--color-crimson); }
+  .nav__link--active {
+    color: var(--color-crimson);
+    border-left: 3px solid var(--color-crimson);
+  }
+
+  .nav__toggle {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-2);
+  }
+  .nav__toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--color-white);
+    transition: all var(--transition-fast);
+  }
+  .nav__toggle--open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+  .nav__toggle--open span:nth-child(2) { opacity: 0; }
+  .nav__toggle--open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+  @media (min-width: 768px) {
+    .nav__links {
+      display: flex;
+      flex-direction: row;
+      position: static;
+      background: none;
+      border: none;
+      padding: 0;
+      gap: var(--space-1);
+    }
+    .nav__link { font-size: var(--text-sm); }
+    .nav__link--active { border-left: none; border-bottom: 2px solid var(--color-crimson); }
+    .nav__toggle { display: none; }
+  }
+</style>

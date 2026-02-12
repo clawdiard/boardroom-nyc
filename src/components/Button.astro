@@ -1,0 +1,88 @@
+---
+interface Props {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+  fullWidth?: boolean;
+}
+
+const { variant = 'primary', size = 'md', href, fullWidth = false } = Astro.props;
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  class:list={['btn', `btn--${variant}`, `btn--${size}`, { 'btn--full': fullWidth }]}
+  href={href}
+>
+  <slot />
+</Tag>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .btn--sm { padding: var(--space-1) var(--space-3); font-size: var(--text-sm); }
+  .btn--md { padding: var(--space-2) var(--space-5); font-size: var(--text-base); }
+  .btn--lg { padding: var(--space-3) var(--space-6); font-size: var(--text-md); }
+  .btn--full { width: 100%; }
+
+  .btn--primary {
+    background: var(--color-crimson);
+    color: var(--color-white);
+    border-color: var(--color-crimson);
+    box-shadow: var(--shadow-md);
+  }
+  .btn--primary:hover {
+    background: transparent;
+    color: var(--color-crimson);
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+
+  .btn--secondary {
+    background: transparent;
+    color: var(--color-white);
+    border-color: var(--color-white);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn--secondary:hover {
+    background: var(--color-white);
+    color: var(--color-midnight);
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+
+  .btn--ghost {
+    background: transparent;
+    color: var(--color-gray-200);
+    border-color: transparent;
+  }
+  .btn--ghost:hover {
+    color: var(--color-crimson);
+  }
+
+  .btn--danger {
+    background: var(--color-error);
+    color: var(--color-white);
+    border-color: var(--color-error);
+    box-shadow: var(--shadow-md);
+  }
+  .btn--danger:hover {
+    background: transparent;
+    color: var(--color-error);
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+</style>

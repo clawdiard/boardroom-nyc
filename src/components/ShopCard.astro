@@ -1,0 +1,111 @@
+---
+interface Props {
+  name: string;
+  neighborhood: string;
+  address?: string;
+  image?: string;
+  rating?: number;
+  tags?: string[];
+  href?: string;
+}
+
+const { name, neighborhood, address, image, rating, tags = [], href } = Astro.props;
+---
+
+<a class="shop-card" href={href || '#'}>
+  <div class="shop-card__image">
+    {image ? (
+      <img src={image} alt={name} loading="lazy" />
+    ) : (
+      <div class="shop-card__placeholder">🛹</div>
+    )}
+    {rating && <span class="shop-card__rating">★ {rating.toFixed(1)}</span>}
+  </div>
+  <div class="shop-card__body">
+    <span class="shop-card__hood">{neighborhood}</span>
+    <h3 class="shop-card__name">{name}</h3>
+    {address && <p class="shop-card__address">{address}</p>}
+    {tags.length > 0 && (
+      <div class="shop-card__tags">
+        {tags.map(tag => <span class="badge">{tag}</span>)}
+      </div>
+    )}
+  </div>
+</a>
+
+<style>
+  .shop-card {
+    display: block;
+    background: var(--surface-card);
+    border: 2px solid var(--color-gray-700);
+    overflow: hidden;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-md);
+  }
+  .shop-card:hover {
+    border-color: var(--color-crimson);
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+
+  .shop-card__image {
+    position: relative;
+    aspect-ratio: 16/10;
+    background: var(--color-gray-800);
+    overflow: hidden;
+  }
+  .shop-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .shop-card__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: var(--text-3xl);
+    opacity: 0.3;
+  }
+  .shop-card__rating {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    background: var(--color-grip-yellow);
+    color: var(--color-black);
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    padding: var(--space-1) var(--space-2);
+    font-weight: 700;
+  }
+
+  .shop-card__body {
+    padding: var(--space-4);
+  }
+  .shop-card__hood {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+    color: var(--color-crimson);
+  }
+  .shop-card__name {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    text-transform: uppercase;
+    margin: var(--space-1) 0 var(--space-2);
+  }
+  .shop-card__address {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .shop-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: var(--space-3);
+  }
+</style>

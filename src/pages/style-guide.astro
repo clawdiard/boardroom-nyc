@@ -1,0 +1,142 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import Badge from '../components/Badge.astro';
+import ShopCard from '../components/ShopCard.astro';
+import ProductCard from '../components/ProductCard.astro';
+---
+
+<Layout title="Design System — Board Room NYC" currentPath="/boardroom-nyc/style-guide/">
+  <div class="container" style="padding: var(--space-8) var(--space-4);">
+
+    <h1>Design System</h1>
+    <p style="color: var(--text-muted); margin-bottom: var(--space-8);">
+      Board Room NYC — Visual component library and design tokens.
+    </p>
+
+    <!-- Colors -->
+    <section style="margin-bottom: var(--space-10);">
+      <h2>Colors</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--space-3); margin-top: var(--space-4);">
+        <div><div style="height: 64px; background: var(--color-crimson); border: 1px solid var(--color-gray-700);"></div><small>Crimson</small></div>
+        <div><div style="height: 64px; background: var(--color-midnight); border: 1px solid var(--color-gray-700);"></div><small>Midnight</small></div>
+        <div><div style="height: 64px; background: var(--color-concrete); border: 1px solid var(--color-gray-700);"></div><small>Concrete</small></div>
+        <div><div style="height: 64px; background: var(--color-asphalt); border: 1px solid var(--color-gray-700);"></div><small>Asphalt</small></div>
+        <div><div style="height: 64px; background: var(--color-grip-yellow); border: 1px solid var(--color-gray-700);"></div><small>Grip Yellow</small></div>
+        <div><div style="height: 64px; background: var(--color-deck-orange); border: 1px solid var(--color-gray-700);"></div><small>Deck Orange</small></div>
+        <div><div style="height: 64px; background: var(--color-neon-green); border: 1px solid var(--color-gray-700);"></div><small>Neon Green</small></div>
+      </div>
+    </section>
+
+    <!-- Typography -->
+    <section style="margin-bottom: var(--space-10);">
+      <h2>Typography</h2>
+      <div style="margin-top: var(--space-4);">
+        <h1>H1 — Board Room NYC</h1>
+        <h2>H2 — Skateboard Shops</h2>
+        <h3>H3 — East Village</h3>
+        <h4>H4 — Shop Details</h4>
+        <h5>H5 — Categories</h5>
+        <h6>H6 — Metadata</h6>
+        <p style="margin-top: var(--space-4);">Body text — Inter. The go-to skate shops in New York City, curated by the community. Find decks, trucks, wheels, and local spots.</p>
+        <p style="font-family: var(--font-mono); font-size: var(--text-sm);">Mono — JetBrains Mono. Used for labels, badges, metadata.</p>
+      </div>
+    </section>
+
+    <!-- Buttons -->
+    <section style="margin-bottom: var(--space-10);">
+      <h2>Buttons</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); align-items: center;">
+        <Button>Primary</Button>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="ghost">Ghost</Button>
+        <Button variant="danger">Danger</Button>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); align-items: center;">
+        <Button size="sm">Small</Button>
+        <Button size="md">Medium</Button>
+        <Button size="lg">Large</Button>
+      </div>
+    </section>
+
+    <!-- Badges -->
+    <section style="margin-bottom: var(--space-10);">
+      <h2>Badges</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4);">
+        <Badge text="Default" />
+        <Badge text="Decks" variant="crimson" />
+        <Badge text="Open Now" variant="green" />
+        <Badge text="Featured" variant="yellow" />
+        <Badge text="New Arrival" variant="orange" />
+      </div>
+    </section>
+
+    <!-- Shop Card -->
+    <section style="margin-bottom: var(--space-10);">
+      <h2>Shop Card</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4); margin-top: var(--space-4);">
+        <ShopCard
+          name="Labor Skateboard Shop"
+          neighborhood="Lower East Side"
+          address="46 Canal St, New York"
+          rating={4.8}
+          tags={['Decks', 'Apparel', 'Community']}
+        />
+        <ShopCard
+          name="KCDC Skateshop"
+          neighborhood="Williamsburg"
+          address="90 N 11th St, Brooklyn"
+          rating={4.6}
+          tags={['Decks', 'Wheels', 'Local Brands']}
+        />
+        <ShopCard
+          name="Homage Brooklyn"
+          neighborhood="Bushwick"
+          address="379 Evergreen Ave, Brooklyn"
+          rating={4.7}
+          tags={['Decks', 'Shoes']}
+        />
+      </div>
+    </section>
+
+    <!-- Product Card -->
+    <section style="margin-bottom: var(--space-10);">
+      <h2>Product Card</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-4); margin-top: var(--space-4);">
+        <ProductCard
+          name="Classic Logo Deck"
+          price="$62.00"
+          brand="Labor"
+          category="Decks"
+        />
+        <ProductCard
+          name="Half Cab Pro"
+          price="$85.00"
+          brand="Vans"
+          category="Shoes"
+        />
+        <ProductCard
+          name="Formula Four 53mm"
+          price="$38.00"
+          brand="Spitfire"
+          category="Wheels"
+          soldOut={true}
+        />
+      </div>
+    </section>
+
+    <!-- Spacing -->
+    <section style="margin-bottom: var(--space-10);">
+      <h2>Spacing Scale</h2>
+      <div style="margin-top: var(--space-4);">
+        {[1,2,3,4,5,6,8,10,12,16].map(n => (
+          <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-2);">
+            <code style="font-family: var(--font-mono); font-size: var(--text-xs); width: 80px; color: var(--text-muted);">--space-{n}</code>
+            <div style={`height: 16px; background: var(--color-crimson); width: var(--space-${n}); opacity: 0.8;`}></div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+  </div>
+</Layout>

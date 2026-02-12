@@ -1,9 +1,14 @@
 ---
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
 interface Props {
   title: string;
+  currentPath?: string;
 }
 
-const { title } = Astro.props;
+const { title, currentPath = '/' } = Astro.props;
 ---
 
 <!doctype html>
@@ -15,30 +20,17 @@ const { title } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/boardroom-nyc/favicon.svg" />
     <link rel="manifest" href="/boardroom-nyc/manifest.json" />
     <meta name="theme-color" content="#1a1a2e" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <title>{title}</title>
     <script defer data-domain="clawdiard.github.io/boardroom-nyc" src="https://plausible.io/js/script.js"></script>
   </head>
   <body>
-    <slot />
+    <Nav currentPath={currentPath} />
+    <main>
+      <slot />
+    </main>
+    <Footer />
   </body>
 </html>
-
-<style is:global>
-  :root {
-    --accent: #e94560;
-    --bg: #1a1a2e;
-    --text: #eee;
-  }
-  html {
-    font-family: system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-  }
-  body {
-    margin: 0;
-    padding: 2rem;
-    min-height: 100vh;
-  }
-  h1 { color: var(--accent); }
-  a { color: var(--accent); }
-</style>

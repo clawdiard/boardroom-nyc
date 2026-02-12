@@ -1,0 +1,47 @@
+---
+interface Props {
+  text: string;
+  variant?: 'default' | 'crimson' | 'yellow' | 'green' | 'orange';
+}
+
+const { text, variant = 'default' } = Astro.props;
+---
+
+<span class:list={['badge', `badge--${variant}`]}>{text}</span>
+
+<style>
+  .badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid;
+  }
+  .badge--default {
+    color: var(--color-gray-200);
+    border-color: var(--color-gray-600);
+    background: var(--color-gray-800);
+  }
+  .badge--crimson {
+    color: var(--color-crimson);
+    border-color: var(--color-crimson);
+    background: rgba(233, 69, 96, 0.1);
+  }
+  .badge--yellow {
+    color: var(--color-grip-yellow);
+    border-color: var(--color-grip-yellow);
+    background: rgba(245, 197, 24, 0.1);
+  }
+  .badge--green {
+    color: var(--color-neon-green);
+    border-color: var(--color-neon-green);
+    background: rgba(57, 255, 20, 0.1);
+  }
+  .badge--orange {
+    color: var(--color-deck-orange);
+    border-color: var(--color-deck-orange);
+    background: rgba(255, 107, 53, 0.1);
+  }
+</style>
