@@ -51,4 +51,18 @@ const products = defineCollection({
   }),
 });
 
-export const collections = { shops, products };
+const events = defineCollection({
+  loader: file('./data/events/events.json'),
+  schema: z.object({
+    id: z.string(),
+    name: z.string(),
+    date: z.string(),
+    time: z.string(),
+    location: z.string(),
+    description: z.string(),
+    shop: z.string().nullable().optional(),
+    link: z.string().nullable().optional(),
+  }),
+});
+
+export const collections = { shops, products, events };

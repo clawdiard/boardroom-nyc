@@ -1,0 +1,150 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Badge from '../../components/Badge.astro';
+
+// Read markdown guide files from content/guides
+const guideFiles = import.meta.glob('/content/guides/*.md', { eager: true });
+const spots = Object.values(guideFiles).map((mod: any) => mod.frontmatter);
+spots.sort((a, b) => a.name.localeCompare(b.name));
+
+const boroughs = [...new Set(spots.map(s => s.borough))].sort();
+---
+
+<Layout title="Skate Spots — Board Room NYC" description="Discover the best skate spots across NYC. From iconic banks to hidden gems in every borough." currentPath="/boardroom-nyc/spots/">
+  <section class="spots-hero">
+    <div class="container">
+      <h1>🛹 NYC Skate Spots</h1>
+      <p class="spots-hero__sub">Your guide to the best spots across all five boroughs</p>
+    </div>
+  </section>
+
+  <section class="spots-map-section">
+    <div class="container">
+      <div id="spots-map" class="spots-map"></div>
+    </div>
+  </section>
+
+  <section class="spots-list">
+    <div class="container">
+      <div class="spots-grid">
+        {spots.map(spot => (
+          <a href={`/boardroom-nyc/spots/${spot.slug}/`} class="spot-card">
+            <div class="spot-card__header">
+              <h2 class="spot-card__name">{spot.name}</h2>
+              <Badge>{spot.difficulty}</Badge>
+            </div>
+            <p class="spot-card__location">📍 {spot.neighborhood}, {spot.borough}</p>
+            <p class="spot-card__desc">{spot.description}</p>
+            <div class="spot-card__features">
+              {spot.features?.map((f: string) => (
+                <span class="spot-card__feature">{f}</span>
+              ))}
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script is:inline define:vars={{ spots, base: '/boardroom-nyc' }}>
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload = () => {
+      const map = L.map('spots-map').setView([40.7128, -73.98], 11);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(map);
+      spots.forEach(s => {
+        if (s.coordinates) {
+          L.marker([s.coordinates.lat, s.coordinates.lng])
+            .addTo(map)
+            .bindPopup(`<b>${s.name}</b><br>${s.neighborhood}<br><a href="${base}/spots/${s.slug}/">View Guide →</a>`);
+        }
+      });
+    };
+    document.head.appendChild(script);
+  </script>
+</Layout>
+
+<style>
+  .spots-hero {
+    background: var(--color-midnight);
+    padding: var(--space-10) 0 var(--space-8);
+    text-align: center;
+  }
+  .spots-hero h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-crimson);
+  }
+  .spots-hero__sub {
+    color: var(--text-secondary);
+    font-size: var(--text-lg);
+    margin-top: var(--space-2);
+  }
+  .spots-map-section { padding: var(--space-8) 0; }
+  .spots-map {
+    height: 400px;
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--color-asphalt);
+  }
+  .spots-list { padding: 0 0 var(--space-10); }
+  .spots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-6);
+  }
+  .spot-card {
+    background: var(--color-concrete);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    text-decoration: none;
+    color: var(--text-primary);
+    border: 1px solid var(--color-asphalt);
+    transition: border-color var(--transition-fast), transform var(--transition-fast);
+  }
+  .spot-card:hover {
+    border-color: var(--color-crimson);
+    transform: translateY(-2px);
+  }
+  .spot-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+  }
+  .spot-card__name {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+  }
+  .spot-card__location {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-3);
+  }
+  .spot-card__desc {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--space-4);
+  }
+  .spot-card__features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .spot-card__feature {
+    font-size: var(--text-xs);
+    background: var(--color-asphalt);
+    color: var(--color-grip-yellow);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    text-transform: capitalize;
+  }
+</style>

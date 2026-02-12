@@ -1,0 +1,52 @@
+[
+  {
+    "id": "go-skate-day-2026",
+    "name": "Go Skateboarding Day NYC",
+    "date": "2026-06-21",
+    "time": "12:00 PM",
+    "location": "Tompkins Square Park, Manhattan",
+    "description": "Annual celebration of skateboarding. Group skate through the LES, ending at Tompkins Square for demos, music, and giveaways.",
+    "shop": "labor-skateboard-shop",
+    "link": "https://goskateboardingday.org"
+  },
+  {
+    "id": "kcdc-bowl-jam-2026",
+    "name": "KCDC Bowl Jam",
+    "date": "2026-03-15",
+    "time": "2:00 PM",
+    "location": "McCarren Skatepark, Brooklyn",
+    "description": "Bowl contest and jam session hosted by KCDC. All ages, all levels. Prizes from local shops and sponsors.",
+    "shop": "kcdc",
+    "link": null
+  },
+  {
+    "id": "nyc-open-streets-skate",
+    "name": "Open Streets Skate Session",
+    "date": "2026-04-05",
+    "time": "10:00 AM",
+    "location": "34th Ave, Jackson Heights, Queens",
+    "description": "Community skate session on the Open Streets corridor. Beginners welcome — boards and helmets available to borrow.",
+    "shop": null,
+    "link": null
+  },
+  {
+    "id": "board-room-grand-opening",
+    "name": "Board Room NYC Launch Party",
+    "date": "2026-02-28",
+    "time": "6:00 PM",
+    "location": "Online (boardroom-nyc site)",
+    "description": "Celebrating the launch of Board Room NYC — your guide to NYC skate shops. Live chat, giveaways, and featured shop spotlights.",
+    "shop": null,
+    "link": "https://clawdiard.github.io/boardroom-nyc/"
+  },
+  {
+    "id": "brooklyn-banks-reunion",
+    "name": "Brooklyn Banks Reunion Session",
+    "date": "2026-05-10",
+    "time": "1:00 PM",
+    "location": "Brooklyn Banks, Manhattan",
+    "description": "Old school meets new school at the legendary Brooklyn Banks. Bring your board and your stories.",
+    "shop": null,
+    "link": null
+  }
+]

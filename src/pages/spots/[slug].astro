@@ -1,0 +1,160 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Badge from '../../components/Badge.astro';
+
+export async function getStaticPaths() {
+  const guideFiles = import.meta.glob('/content/guides/*.md', { eager: true });
+  return Object.values(guideFiles).map((mod: any) => ({
+    params: { slug: mod.frontmatter.slug },
+    props: { mod },
+  }));
+}
+
+const { mod: spotMod } = Astro.props;
+const spot = spotMod.frontmatter;
+const Content = spotMod.default;
+const { slug } = Astro.params;
+---
+
+<Layout
+  title={`${spot.name} — Skate Spot Guide | Board Room NYC`}
+  description={spot.description}
+  currentPath={`/boardroom-nyc/spots/${slug}/`}
+>
+  <article class="spot-detail">
+    <div class="container">
+      <a href="/boardroom-nyc/spots/" class="spot-detail__back">← All Spots</a>
+
+      <header class="spot-detail__header">
+        <h1>{spot.name}</h1>
+        <div class="spot-detail__meta">
+          <Badge>{spot.difficulty}</Badge>
+          <span class="spot-detail__location">📍 {spot.neighborhood}, {spot.borough}</span>
+        </div>
+      </header>
+
+      <div class="spot-detail__map-wrap">
+        <div id="spot-map" class="spot-detail__map"></div>
+      </div>
+
+      <div class="spot-detail__features">
+        <h3>Features</h3>
+        <div class="spot-detail__feature-list">
+          {spot.features?.map((f: string) => (
+            <span class="spot-detail__feature">{f}</span>
+          ))}
+        </div>
+      </div>
+
+      <div class="spot-detail__tips">
+        <h3>💡 Tips</h3>
+        <p>{spot.tips}</p>
+      </div>
+
+      <div class="spot-detail__content prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script is:inline define:vars={{ lat: spot.coordinates.lat, lng: spot.coordinates.lng, name: spot.name }}>
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload = () => {
+      const map = L.map('spot-map').setView([lat, lng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(map);
+      L.marker([lat, lng]).addTo(map).bindPopup(`<b>${name}</b>`).openPopup();
+    };
+    document.head.appendChild(script);
+  </script>
+</Layout>
+
+<style>
+  .spot-detail { padding: var(--space-8) 0 var(--space-10); }
+  .spot-detail__back {
+    display: inline-block;
+    color: var(--color-crimson);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-6);
+  }
+  .spot-detail__back:hover { text-decoration: underline; }
+  .spot-detail__header { margin-bottom: var(--space-6); }
+  .spot-detail__header h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-crimson);
+    margin-bottom: var(--space-3);
+  }
+  .spot-detail__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .spot-detail__location {
+    color: var(--text-secondary);
+    font-size: var(--text-md);
+  }
+  .spot-detail__map-wrap { margin-bottom: var(--space-8); }
+  .spot-detail__map {
+    height: 300px;
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--color-asphalt);
+  }
+  .spot-detail__features { margin-bottom: var(--space-6); }
+  .spot-detail__features h3 {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    margin-bottom: var(--space-3);
+    color: var(--text-primary);
+  }
+  .spot-detail__feature-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .spot-detail__feature {
+    font-size: var(--text-sm);
+    background: var(--color-asphalt);
+    color: var(--color-grip-yellow);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    text-transform: capitalize;
+  }
+  .spot-detail__tips {
+    background: var(--color-concrete);
+    border-left: 3px solid var(--color-grip-yellow);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-8);
+  }
+  .spot-detail__tips h3 { margin-bottom: var(--space-2); }
+  .spot-detail__tips p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .spot-detail__content {
+    line-height: 1.8;
+    color: var(--text-secondary);
+  }
+  .spot-detail__content :global(h2) {
+    font-family: var(--font-display);
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+  .spot-detail__content :global(ul) {
+    padding-left: var(--space-5);
+    margin-bottom: var(--space-4);
+  }
+  .spot-detail__content :global(li) { margin-bottom: var(--space-2); }
+  .spot-detail__content :global(strong) { color: var(--text-primary); }
+</style>
