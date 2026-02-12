@@ -1,0 +1,30 @@
+{
+  "slug": "uncle-funkys-boards",
+  "name": "Uncle Funky's Boards",
+  "tagline": "Funky since day one",
+  "borough": "Manhattan",
+  "neighborhood": "Greenwich Village",
+  "address": "338 6th Ave, New York, NY 10014",
+  "coordinates": { "lat": 40.7318, "lng": -73.9996 },
+  "phone": "+12129869730",
+  "website": "https://unclefunkysboards.com",
+  "instagram": "@unclefunkysboards",
+  "hours": {
+    "monday": "11:00-19:00",
+    "tuesday": "11:00-19:00",
+    "wednesday": "11:00-19:00",
+    "thursday": "11:00-19:00",
+    "friday": "11:00-20:00",
+    "saturday": "10:00-20:00",
+    "sunday": "11:00-18:00"
+  },
+  "specialties": ["longboards", "cruisers", "decks", "beginner-friendly"],
+  "vibes": ["welcoming", "tourist-friendly", "chill"],
+  "team_riders": [],
+  "story": "A Village institution for skaters of all levels. Known for patient staff and an incredible longboard selection.",
+  "photos": [],
+  "pos_system": "square",
+  "pos_api_enabled": false,
+  "subscription_tier": "free",
+  "joined_date": "2026-02-10"
+}

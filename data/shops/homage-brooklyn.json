@@ -1,0 +1,30 @@
+{
+  "slug": "homage-brooklyn",
+  "name": "Homage Brooklyn",
+  "tagline": "Skate. Art. Community.",
+  "borough": "Brooklyn",
+  "neighborhood": "Bushwick",
+  "address": "5 Knickerbocker Ave, Brooklyn, NY 11237",
+  "coordinates": { "lat": 40.7005, "lng": -73.9198 },
+  "phone": "+17184843277",
+  "website": "https://homagebrooklyn.com",
+  "instagram": "@homagebrooklyn",
+  "hours": {
+    "monday": "12:00-20:00",
+    "tuesday": "12:00-20:00",
+    "wednesday": "12:00-20:00",
+    "thursday": "12:00-20:00",
+    "friday": "12:00-20:00",
+    "saturday": "11:00-20:00",
+    "sunday": "11:00-19:00"
+  },
+  "specialties": ["decks", "wheels", "trucks", "streetwear"],
+  "vibes": ["artsy", "inclusive", "underground"],
+  "team_riders": [],
+  "story": "Bushwick's go-to for boards and culture. Art shows, video premieres, and community events on the regular.",
+  "photos": [],
+  "pos_system": "shopify",
+  "pos_api_enabled": true,
+  "subscription_tier": "basic",
+  "joined_date": "2026-02-01"
+}

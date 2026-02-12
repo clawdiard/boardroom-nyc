@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "shop.schema.json",
+  "title": "Shop Profile",
+  "type": "object",
+  "required": ["slug", "name", "borough", "neighborhood", "address", "coordinates", "hours", "joined_date"],
+  "properties": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "name": { "type": "string" },
+    "tagline": { "type": "string" },
+    "borough": { "type": "string", "enum": ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"] },
+    "neighborhood": { "type": "string" },
+    "address": { "type": "string" },
+    "coordinates": {
+      "type": "object",
+      "required": ["lat", "lng"],
+      "properties": {
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+        "lng": { "type": "number", "minimum": -180, "maximum": 180 }
+      }
+    },
+    "phone": { "type": "string" },
+    "website": { "type": "string", "format": "uri" },
+    "instagram": { "type": "string" },
+    "hours": {
+      "type": "object",
+      "properties": {
+        "monday": { "type": "string" },
+        "tuesday": { "type": "string" },
+        "wednesday": { "type": "string" },
+        "thursday": { "type": "string" },
+        "friday": { "type": "string" },
+        "saturday": { "type": "string" },
+        "sunday": { "type": "string" }
+      }
+    },
+    "specialties": { "type": "array", "items": { "type": "string" } },
+    "vibes": { "type": "array", "items": { "type": "string" } },
+    "team_riders": { "type": "array", "items": { "type": "string" } },
+    "story": { "type": "string" },
+    "photos": { "type": "array", "items": { "type": "string", "format": "uri" } },
+    "pos_system": { "type": "string" },
+    "pos_api_enabled": { "type": "boolean" },
+    "subscription_tier": { "type": "string", "enum": ["free", "basic", "pro", "enterprise"] },
+    "joined_date": { "type": "string", "format": "date" }
+  },
+  "additionalProperties": false
+}

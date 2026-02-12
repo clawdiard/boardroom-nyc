@@ -1,0 +1,30 @@
+{
+  "slug": "labor-skateshop",
+  "name": "Labor Skateboard Shop",
+  "tagline": "NYC skateboarding since 2002",
+  "borough": "Manhattan",
+  "neighborhood": "Lower East Side",
+  "address": "46 Canal St, New York, NY 10002",
+  "coordinates": { "lat": 40.7157, "lng": -73.9967 },
+  "phone": "+12122742255",
+  "website": "https://laborskateshop.com",
+  "instagram": "@laborskateshop",
+  "hours": {
+    "monday": "12:00-19:00",
+    "tuesday": "12:00-19:00",
+    "wednesday": "12:00-19:00",
+    "thursday": "12:00-19:00",
+    "friday": "12:00-19:00",
+    "saturday": "11:00-19:00",
+    "sunday": "12:00-18:00"
+  },
+  "specialties": ["decks", "hardware", "apparel", "local brands"],
+  "vibes": ["community-driven", "old-school", "local legend"],
+  "team_riders": ["Alex Corporan", "Lurker Lou"],
+  "story": "A cornerstone of NYC skate culture on Canal Street, Labor has been the meeting point for downtown skaters for over two decades.",
+  "photos": [],
+  "pos_system": "square",
+  "pos_api_enabled": false,
+  "subscription_tier": "pro",
+  "joined_date": "2026-01-15"
+}

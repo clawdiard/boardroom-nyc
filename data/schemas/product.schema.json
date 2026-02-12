@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "product.schema.json",
+  "title": "Product",
+  "type": "object",
+  "required": ["id", "shop_slug", "name", "brand", "category", "price", "currency", "in_stock"],
+  "properties": {
+    "id": { "type": "string" },
+    "shop_slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "name": { "type": "string" },
+    "brand": { "type": "string" },
+    "category": { "type": "string" },
+    "subcategory": { "type": "string" },
+    "price": { "type": "number", "minimum": 0 },
+    "currency": { "type": "string", "default": "USD" },
+    "size": { "type": "string" },
+    "in_stock": { "type": "boolean" },
+    "quantity": { "type": "integer", "minimum": 0 },
+    "image": { "type": "string" },
+    "url": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "last_updated": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}
