@@ -1,33 +1,41 @@
 ---
 interface Props {
   name: string;
+  slug: string;
+  borough: string;
   neighborhood: string;
   address?: string;
   image?: string;
-  rating?: number;
-  tags?: string[];
-  href?: string;
+  specialties?: string[];
+  isOpen?: boolean;
 }
 
-const { name, neighborhood, address, image, rating, tags = [], href } = Astro.props;
+const { name, slug, borough, neighborhood, address, image, specialties = [], isOpen } = Astro.props;
 ---
 
-<a class="shop-card" href={href || '#'}>
+<a class="shop-card" href={`/shops/${slug}`} data-borough={borough} data-specialties={specialties.join(',')}>
   <div class="shop-card__image">
     {image ? (
       <img src={image} alt={name} loading="lazy" />
     ) : (
       <div class="shop-card__placeholder">🛹</div>
     )}
-    {rating && <span class="shop-card__rating">★ {rating.toFixed(1)}</span>}
+    {isOpen !== undefined && (
+      <span class={`shop-card__status ${isOpen ? 'shop-card__status--open' : 'shop-card__status--closed'}`}>
+        {isOpen ? '● Open Now' : '● Closed'}
+      </span>
+    )}
   </div>
   <div class="shop-card__body">
-    <span class="shop-card__hood">{neighborhood}</span>
+    <div class="shop-card__meta">
+      <span class="shop-card__hood">{neighborhood}</span>
+      <span class="shop-card__borough">{borough}</span>
+    </div>
     <h3 class="shop-card__name">{name}</h3>
     {address && <p class="shop-card__address">{address}</p>}
-    {tags.length > 0 && (
+    {specialties.length > 0 && (
       <div class="shop-card__tags">
-        {tags.map(tag => <span class="badge">{tag}</span>)}
+        {specialties.map(tag => <span class="badge">{tag}</span>)}
       </div>
     )}
   </div>
@@ -49,7 +57,6 @@ const { name, neighborhood, address, image, rating, tags = [], href } = Astro.pr
     transform: translate(2px, 2px);
     box-shadow: none;
   }
-
   .shop-card__image {
     position: relative;
     aspect-ratio: 16/10;
@@ -69,20 +76,30 @@ const { name, neighborhood, address, image, rating, tags = [], href } = Astro.pr
     font-size: var(--text-3xl);
     opacity: 0.3;
   }
-  .shop-card__rating {
+  .shop-card__status {
     position: absolute;
     top: var(--space-2);
     right: var(--space-2);
-    background: var(--color-grip-yellow);
-    color: var(--color-black);
-    font-family: var(--font-display);
-    font-size: var(--text-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
     padding: var(--space-1) var(--space-2);
     font-weight: 700;
   }
-
+  .shop-card__status--open {
+    background: var(--color-neon-green);
+    color: var(--color-black);
+  }
+  .shop-card__status--closed {
+    background: var(--color-gray-600);
+    color: var(--color-gray-300);
+  }
   .shop-card__body {
     padding: var(--space-4);
+  }
+  .shop-card__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   .shop-card__hood {
     font-family: var(--font-mono);
@@ -90,6 +107,13 @@ const { name, neighborhood, address, image, rating, tags = [], href } = Astro.pr
     text-transform: uppercase;
     letter-spacing: var(--tracking-display);
     color: var(--color-crimson);
+  }
+  .shop-card__borough {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
   }
   .shop-card__name {
     font-family: var(--font-display);

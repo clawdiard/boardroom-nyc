@@ -1,0 +1,202 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ShopCard from '../../components/ShopCard.astro';
+import { isShopOpen, getBoroughs, getSpecialties } from '../../utils/shops.ts';
+import fs from 'node:fs';
+import path from 'node:path';
+
+// Load all shop JSON files
+const shopDir = path.resolve('data/shops');
+const shopFiles = fs.readdirSync(shopDir).filter(f => f.endsWith('.json'));
+const shops = shopFiles.map(f => JSON.parse(fs.readFileSync(path.join(shopDir, f), 'utf-8')));
+
+// Sort by name by default
+shops.sort((a, b) => a.name.localeCompare(b.name));
+
+const boroughs = getBoroughs(shops);
+const specialties = getSpecialties(shops);
+---
+
+<Layout title="Shops — Board Room NYC" description="Browse NYC's best skate shops. Filter by borough and specialty.">
+  <main class="shops-page">
+    <header class="shops-header">
+      <h1>NYC Skate Shops</h1>
+      <p class="shops-subtitle">Find your local board dealer</p>
+    </header>
+
+    <div class="shops-controls" id="shop-controls">
+      <div class="filter-group">
+        <label class="filter-label">Borough</label>
+        <select id="filter-borough" class="filter-select">
+          <option value="">All Boroughs</option>
+          {boroughs.map(b => <option value={b}>{b}</option>)}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Specialty</label>
+        <select id="filter-specialty" class="filter-select">
+          <option value="">All Specialties</option>
+          {specialties.map(s => <option value={s}>{s}</option>)}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Sort</label>
+        <select id="sort-select" class="filter-select">
+          <option value="name">Name</option>
+          <option value="borough">Borough</option>
+          <option value="newest">Newest</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="shops-grid" id="shops-grid">
+      {shops.map(shop => (
+        <ShopCard
+          name={shop.name}
+          slug={shop.slug}
+          borough={shop.borough}
+          neighborhood={shop.neighborhood}
+          address={shop.address}
+          specialties={shop.specialties}
+          isOpen={isShopOpen(shop.hours)}
+        />
+      ))}
+    </div>
+
+    <p class="shops-empty" id="shops-empty" style="display:none;">
+      No shops match your filters. Try broadening your search.
+    </p>
+  </main>
+</Layout>
+
+<script>
+  const boroughSelect = document.getElementById('filter-borough') as HTMLSelectElement;
+  const specialtySelect = document.getElementById('filter-specialty') as HTMLSelectElement;
+  const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
+  const grid = document.getElementById('shops-grid')!;
+  const emptyMsg = document.getElementById('shops-empty')!;
+
+  function applyFilters() {
+    const borough = boroughSelect.value;
+    const specialty = specialtySelect.value;
+    const cards = Array.from(grid.querySelectorAll('.shop-card')) as HTMLAnchorElement[];
+    let visible = 0;
+
+    cards.forEach(card => {
+      const cardBorough = card.dataset.borough || '';
+      const cardSpecs = (card.dataset.specialties || '').split(',');
+      const matchBorough = !borough || cardBorough === borough;
+      const matchSpecialty = !specialty || cardSpecs.includes(specialty);
+      const show = matchBorough && matchSpecialty;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    emptyMsg.style.display = visible === 0 ? '' : 'none';
+  }
+
+  function applySort() {
+    const sortBy = sortSelect.value;
+    const cards = Array.from(grid.querySelectorAll('.shop-card')) as HTMLAnchorElement[];
+    cards.sort((a, b) => {
+      if (sortBy === 'borough') {
+        return (a.dataset.borough || '').localeCompare(b.dataset.borough || '') ||
+               a.querySelector('.shop-card__name')!.textContent!.localeCompare(b.querySelector('.shop-card__name')!.textContent!);
+      }
+      if (sortBy === 'newest') {
+        // Reverse DOM order (newest added last in data)
+        return 0; // Keep original for now, could use data attr
+      }
+      // name
+      return a.querySelector('.shop-card__name')!.textContent!.localeCompare(b.querySelector('.shop-card__name')!.textContent!);
+    });
+    cards.forEach(c => grid.appendChild(c));
+    applyFilters();
+  }
+
+  boroughSelect.addEventListener('change', applyFilters);
+  specialtySelect.addEventListener('change', applyFilters);
+  sortSelect.addEventListener('change', applySort);
+</script>
+
+<style>
+  .shops-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4);
+  }
+  .shops-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+  .shops-header h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    text-transform: uppercase;
+    color: var(--text-primary);
+    margin: 0;
+  }
+  .shops-subtitle {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+    margin-top: var(--space-2);
+  }
+  .shops-controls {
+    display: flex;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+    flex-wrap: wrap;
+  }
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .filter-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+    color: var(--text-muted);
+  }
+  .filter-select {
+    background: var(--color-gray-800);
+    color: var(--text-primary);
+    border: 2px solid var(--color-gray-700);
+    padding: var(--space-2) var(--space-3);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    min-width: 160px;
+  }
+  .filter-select:focus {
+    outline: none;
+    border-color: var(--color-crimson);
+  }
+  .shops-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-5);
+  }
+  .shops-empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    padding: var(--space-10) 0;
+  }
+
+  @media (max-width: 640px) {
+    .shops-controls {
+      flex-direction: column;
+    }
+    .filter-select {
+      width: 100%;
+    }
+    .shops-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

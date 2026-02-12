@@ -1,0 +1,339 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Badge from '../../components/Badge.astro';
+import { isShopOpen } from '../../utils/shops.ts';
+import fs from 'node:fs';
+import path from 'node:path';
+
+export function getStaticPaths() {
+  const shopDir = path.resolve('data/shops');
+  const shopFiles = fs.readdirSync(shopDir).filter(f => f.endsWith('.json'));
+  return shopFiles.map(f => {
+    const shop = JSON.parse(fs.readFileSync(path.join(shopDir, f), 'utf-8'));
+    return { params: { slug: shop.slug }, props: { shop } };
+  });
+}
+
+const { shop } = Astro.props;
+const open = isShopOpen(shop.hours);
+const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+const dayLabels: Record<string, string> = {
+  monday: 'Mon', tuesday: 'Tue', wednesday: 'Wed', thursday: 'Thu',
+  friday: 'Fri', saturday: 'Sat', sunday: 'Sun'
+};
+
+// Schema.org LocalBusiness structured data
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": shop.name,
+  "description": shop.story || shop.tagline,
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": shop.address,
+    "addressLocality": "New York",
+    "addressRegion": "NY",
+    "addressCountry": "US"
+  },
+  "geo": shop.coordinates ? {
+    "@type": "GeoCoordinates",
+    "latitude": shop.coordinates.lat,
+    "longitude": shop.coordinates.lng
+  } : undefined,
+  "telephone": shop.phone,
+  "url": shop.website,
+  "openingHours": dayOrder
+    .filter(d => shop.hours[d] && shop.hours[d].toLowerCase() !== 'closed')
+    .map(d => {
+      const abbr = d.slice(0, 2).charAt(0).toUpperCase() + d.slice(1, 2);
+      return `${abbr} ${shop.hours[d]}`;
+    })
+};
+---
+
+<Layout
+  title={`${shop.name} — Board Room NYC`}
+  description={`${shop.name} in ${shop.neighborhood}, ${shop.borough}. ${shop.tagline}`}
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <meta property="og:title" content={`${shop.name} — Board Room NYC`} />
+    <meta property="og:description" content={shop.tagline} />
+    <meta property="og:type" content="business.business" />
+  </Fragment>
+
+  <main class="shop-profile">
+    <a href="/shops" class="back-link">← All Shops</a>
+
+    <header class="profile-header">
+      <div class="profile-hero">
+        {shop.photos && shop.photos.length > 0 ? (
+          <img src={shop.photos[0]} alt={shop.name} class="hero-image" />
+        ) : (
+          <div class="hero-placeholder">🛹</div>
+        )}
+      </div>
+
+      <div class="profile-intro">
+        <div class="profile-meta">
+          <span class="profile-hood">{shop.neighborhood}, {shop.borough}</span>
+          <span class={`status-badge ${open ? 'status-badge--open' : 'status-badge--closed'}`}>
+            {open ? '● Open Now' : '● Closed'}
+          </span>
+        </div>
+        <h1 class="profile-name">{shop.name}</h1>
+        {shop.tagline && <p class="profile-tagline">{shop.tagline}</p>}
+      </div>
+    </header>
+
+    <div class="profile-grid">
+      <section class="profile-main">
+        {shop.story && (
+          <div class="profile-section">
+            <h2>The Story</h2>
+            <p>{shop.story}</p>
+          </div>
+        )}
+
+        {shop.specialties && shop.specialties.length > 0 && (
+          <div class="profile-section">
+            <h2>Specialties</h2>
+            <div class="tags-row">
+              {shop.specialties.map((s: string) => <Badge text={s} variant="crimson" />)}
+            </div>
+          </div>
+        )}
+
+        {shop.team_riders && shop.team_riders.length > 0 && (
+          <div class="profile-section">
+            <h2>Team Riders</h2>
+            <ul class="riders-list">
+              {shop.team_riders.map((r: string) => <li>{r}</li>)}
+            </ul>
+          </div>
+        )}
+
+        {shop.instagram && (
+          <div class="profile-section">
+            <h2>Instagram</h2>
+            <a href={`https://instagram.com/${shop.instagram.replace('@', '')}`} class="insta-link" target="_blank" rel="noopener">
+              {shop.instagram}
+            </a>
+          </div>
+        )}
+      </section>
+
+      <aside class="profile-sidebar">
+        <div class="sidebar-card">
+          <h3>Hours</h3>
+          <ul class="hours-list">
+            {dayOrder.map(day => (
+              <li class="hours-row">
+                <span class="hours-day">{dayLabels[day]}</span>
+                <span class="hours-time">{shop.hours[day] || 'Closed'}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="sidebar-card">
+          <h3>Location</h3>
+          <p class="sidebar-address">{shop.address}</p>
+          {shop.phone && <p class="sidebar-phone"><a href={`tel:${shop.phone}`}>{shop.phone}</a></p>}
+          {shop.website && (
+            <a href={shop.website} class="sidebar-website" target="_blank" rel="noopener">
+              Visit Website →
+            </a>
+          )}
+        </div>
+      </aside>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .shop-profile {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4);
+  }
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-crimson);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  .profile-header { margin-top: var(--space-4); }
+  .profile-hero {
+    aspect-ratio: 21/9;
+    background: var(--color-gray-800);
+    overflow: hidden;
+    margin-bottom: var(--space-5);
+  }
+  .hero-image { width: 100%; height: 100%; object-fit: cover; }
+  .hero-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: var(--text-4xl);
+    opacity: 0.2;
+  }
+
+  .profile-intro { margin-bottom: var(--space-6); }
+  .profile-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+  }
+  .profile-hood {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+    color: var(--color-crimson);
+  }
+  .status-badge {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    padding: var(--space-1) var(--space-2);
+    font-weight: 700;
+  }
+  .status-badge--open {
+    background: var(--color-neon-green);
+    color: var(--color-black);
+  }
+  .status-badge--closed {
+    background: var(--color-gray-600);
+    color: var(--color-gray-300);
+  }
+  .profile-name {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .profile-tagline {
+    font-size: var(--text-md);
+    color: var(--text-secondary);
+    margin-top: var(--space-2);
+    font-style: italic;
+  }
+
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--space-6);
+  }
+
+  .profile-section {
+    margin-bottom: var(--space-6);
+  }
+  .profile-section h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    text-transform: uppercase;
+    margin: 0 0 var(--space-3);
+    color: var(--text-primary);
+  }
+  .profile-section p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .riders-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .riders-list li {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    padding: var(--space-1) 0;
+    border-bottom: 1px solid var(--color-gray-700);
+  }
+  .insta-link {
+    font-family: var(--font-mono);
+    color: var(--color-crimson);
+    text-decoration: none;
+  }
+  .insta-link:hover { text-decoration: underline; }
+
+  .sidebar-card {
+    background: var(--surface-card);
+    border: 2px solid var(--color-gray-700);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+  .sidebar-card h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    text-transform: uppercase;
+    margin: 0 0 var(--space-3);
+    color: var(--color-crimson);
+  }
+  .hours-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .hours-row {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-1) 0;
+    font-size: var(--text-sm);
+    border-bottom: 1px solid var(--color-gray-700);
+  }
+  .hours-day {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  .hours-time { color: var(--text-secondary); }
+
+  .sidebar-address {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-2);
+    line-height: 1.5;
+  }
+  .sidebar-phone {
+    margin: 0 0 var(--space-2);
+  }
+  .sidebar-phone a {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+  .sidebar-phone a:hover { color: var(--color-crimson); }
+  .sidebar-website {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-crimson);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+  }
+  .sidebar-website:hover { text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    .profile-grid {
+      grid-template-columns: 1fr;
+    }
+    .profile-name {
+      font-size: var(--text-2xl);
+    }
+  }
+</style>
