@@ -1,0 +1,107 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.9198,
+          40.7005
+        ]
+      },
+      "properties": {
+        "name": "Homage Brooklyn",
+        "slug": "homage-brooklyn",
+        "address": "5 Knickerbocker Ave, Brooklyn, NY 11237",
+        "borough": "Brooklyn",
+        "neighborhood": "Bushwick",
+        "specialties": [
+          "decks",
+          "wheels",
+          "trucks",
+          "streetwear"
+        ],
+        "website": "https://homagebrooklyn.com",
+        "hours": {
+          "monday": "12:00-20:00",
+          "tuesday": "12:00-20:00",
+          "wednesday": "12:00-20:00",
+          "thursday": "12:00-20:00",
+          "friday": "12:00-20:00",
+          "saturday": "11:00-20:00",
+          "sunday": "11:00-19:00"
+        },
+        "todayHours": "12:00-20:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.9967,
+          40.7157
+        ]
+      },
+      "properties": {
+        "name": "Labor Skateboard Shop",
+        "slug": "labor-skateshop",
+        "address": "46 Canal St, New York, NY 10002",
+        "borough": "Manhattan",
+        "neighborhood": "Lower East Side",
+        "specialties": [
+          "decks",
+          "hardware",
+          "apparel",
+          "local brands"
+        ],
+        "website": "https://laborskateshop.com",
+        "hours": {
+          "monday": "12:00-19:00",
+          "tuesday": "12:00-19:00",
+          "wednesday": "12:00-19:00",
+          "thursday": "12:00-19:00",
+          "friday": "12:00-19:00",
+          "saturday": "11:00-19:00",
+          "sunday": "12:00-18:00"
+        },
+        "todayHours": "12:00-19:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.9996,
+          40.7318
+        ]
+      },
+      "properties": {
+        "name": "Uncle Funky's Boards",
+        "slug": "uncle-funkys-boards",
+        "address": "338 6th Ave, New York, NY 10014",
+        "borough": "Manhattan",
+        "neighborhood": "Greenwich Village",
+        "specialties": [
+          "longboards",
+          "cruisers",
+          "decks",
+          "beginner-friendly"
+        ],
+        "website": "https://unclefunkysboards.com",
+        "hours": {
+          "monday": "11:00-19:00",
+          "tuesday": "11:00-19:00",
+          "wednesday": "11:00-19:00",
+          "thursday": "11:00-19:00",
+          "friday": "11:00-20:00",
+          "saturday": "10:00-20:00",
+          "sunday": "11:00-18:00"
+        },
+        "todayHours": "11:00-19:00"
+      }
+    }
+  ]
+}

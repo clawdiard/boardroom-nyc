@@ -1,0 +1,248 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Shop Map — Board Room NYC">
+  <main class="map-page">
+    <header class="map-header">
+      <h1>🗺️ NYC Skate Shop Map</h1>
+      <p>Every skate shop in the five boroughs. Click a pin for details.</p>
+    </header>
+
+    <div class="map-controls">
+      <div class="filter-group">
+        <label for="borough-filter">Borough</label>
+        <select id="borough-filter">
+          <option value="">All Boroughs</option>
+          <option value="Manhattan">Manhattan</option>
+          <option value="Brooklyn">Brooklyn</option>
+          <option value="Queens">Queens</option>
+          <option value="Bronx">Bronx</option>
+          <option value="Staten Island">Staten Island</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="specialty-filter">Specialty</label>
+        <select id="specialty-filter">
+          <option value="">All Specialties</option>
+          <option value="decks">Decks</option>
+          <option value="trucks">Trucks</option>
+          <option value="wheels">Wheels</option>
+          <option value="bearings">Bearings</option>
+          <option value="apparel">Apparel</option>
+          <option value="hardware">Hardware</option>
+          <option value="local brands">Local Brands</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="open-now-filter" />
+          Open Now
+        </label>
+      </div>
+    </div>
+
+    <div id="map" class="map-container"></div>
+  </main>
+</Layout>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+<style>
+  .map-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+
+  .map-header {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .map-header h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .map-header p {
+    color: var(--color-muted, #666);
+    margin: 0;
+  }
+
+  .map-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface, #f5f5f5);
+    border-radius: 8px;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .filter-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-muted, #666);
+  }
+
+  .filter-group select {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: white;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding-bottom: 0.4rem;
+  }
+
+  .map-container {
+    width: 100%;
+    height: 70vh;
+    min-height: 400px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border, #ddd);
+    z-index: 0;
+  }
+
+  @media (max-width: 600px) {
+    .map-controls {
+      flex-direction: column;
+    }
+    .map-container {
+      height: 60vh;
+    }
+  }
+</style>
+
+<script>
+  import L from 'leaflet';
+  import 'leaflet.markercluster';
+
+  const BASE = import.meta.env.BASE_URL || '/boardroom-nyc/';
+
+  // NYC center
+  const NYC_CENTER: [number, number] = [40.7128, -74.006];
+  const DEFAULT_ZOOM = 12;
+
+  // Custom skate pin icon
+  const shopIcon = L.divIcon({
+    html: '<span style="font-size:1.6rem">🛹</span>',
+    className: 'shop-marker',
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -14],
+  });
+
+  // Determine if shop is open now (EST approximation: UTC-5)
+  function isOpenNow(hours: Record<string, string>): boolean {
+    const now = new Date();
+    const estOffset = -5;
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const est = new Date(utc + estOffset * 3600000);
+
+    const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+    const dayName = days[est.getDay()];
+    const todayHours = hours[dayName];
+    if (!todayHours || todayHours.toLowerCase() === 'closed') return false;
+
+    const [open, close] = todayHours.split('-').map(t => {
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    });
+    const nowMin = est.getHours() * 60 + est.getMinutes();
+    return nowMin >= open && nowMin < close;
+  }
+
+  async function initMap() {
+    const map = L.map('map').setView(NYC_CENTER, DEFAULT_ZOOM);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19,
+    }).addTo(map);
+
+    const res = await fetch(`${BASE}shops.geojson`);
+    const geojson = await res.json();
+
+    const cluster = (L as any).markerClusterGroup();
+    let allMarkers: { marker: L.Marker; props: any }[] = [];
+
+    for (const feature of geojson.features) {
+      const { coordinates } = feature.geometry;
+      const props = feature.properties;
+      const latlng: [number, number] = [coordinates[1], coordinates[0]];
+
+      const openStatus = isOpenNow(props.hours) ? '🟢 Open' : '🔴 Closed';
+      const specialties = (props.specialties || []).join(', ');
+      const shopUrl = `${BASE}shops/${props.slug}/`;
+
+      const popup = `
+        <div style="min-width:180px">
+          <strong style="font-size:1.1em">${props.name}</strong><br/>
+          <span style="color:#666">${props.neighborhood}, ${props.borough}</span><br/>
+          <span>${props.address}</span><br/>
+          <span>${openStatus}</span><br/>
+          ${specialties ? `<span>🏷️ ${specialties}</span><br/>` : ''}
+          <a href="${shopUrl}" style="font-weight:600">View Profile →</a>
+          ${props.website ? ` · <a href="${props.website}" target="_blank" rel="noopener">Website</a>` : ''}
+        </div>
+      `;
+
+      const marker = L.marker(latlng, { icon: shopIcon }).bindPopup(popup);
+      allMarkers.push({ marker, props });
+      cluster.addLayer(marker);
+    }
+
+    map.addLayer(cluster);
+
+    // Filter logic
+    const boroughSelect = document.getElementById('borough-filter') as HTMLSelectElement;
+    const specialtySelect = document.getElementById('specialty-filter') as HTMLSelectElement;
+    const openNowCheck = document.getElementById('open-now-filter') as HTMLInputElement;
+
+    function applyFilters() {
+      const borough = boroughSelect.value;
+      const specialty = specialtySelect.value;
+      const openOnly = openNowCheck.checked;
+
+      cluster.clearLayers();
+
+      for (const { marker, props } of allMarkers) {
+        if (borough && props.borough !== borough) continue;
+        if (specialty && !(props.specialties || []).includes(specialty)) continue;
+        if (openOnly && !isOpenNow(props.hours)) continue;
+        cluster.addLayer(marker);
+      }
+    }
+
+    boroughSelect.addEventListener('change', applyFilters);
+    specialtySelect.addEventListener('change', applyFilters);
+    openNowCheck.addEventListener('change', applyFilters);
+  }
+
+  // Run when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMap);
+  } else {
+    initMap();
+  }
+</script>

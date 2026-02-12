@@ -6,6 +6,28 @@ import Layout from '../layouts/Layout.astro';
   <main>
     <h1>🛹 Board Room NYC</h1>
     <p>Your guide to NYC's skateboard scene — shops, gear, events, and more.</p>
-    <p><em>Coming soon.</em></p>
+    <nav class="home-nav">
+      <a href={`${import.meta.env.BASE_URL}shops/`}>Browse Shops</a>
+      <a href={`${import.meta.env.BASE_URL}map/`}>🗺️ Shop Map</a>
+    </nav>
   </main>
 </Layout>
+
+<style>
+  .home-nav {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .home-nav a {
+    padding: 0.6rem 1.2rem;
+    background: var(--color-primary, #222);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .home-nav a:hover {
+    opacity: 0.85;
+  }
+</style>
