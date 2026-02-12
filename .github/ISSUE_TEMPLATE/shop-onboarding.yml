@@ -1,0 +1,160 @@
+name: Shop Onboarding
+description: Submit your shop profile to Board Room NYC
+title: "[Shop Onboarding] "
+labels: ["shop-onboarding", "automated"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Welcome to Board Room NYC! 🛹
+        Fill out this form to get your shop listed. All fields marked with * are required.
+
+  - type: input
+    id: shop_name
+    attributes:
+      label: Shop Name *
+      placeholder: "e.g. Labor Skateboard Shop"
+    validations:
+      required: true
+
+  - type: input
+    id: slug
+    attributes:
+      label: URL Slug *
+      description: "Lowercase, hyphens only (e.g. labor-skateshop)"
+      placeholder: "my-skate-shop"
+    validations:
+      required: true
+
+  - type: input
+    id: tagline
+    attributes:
+      label: Tagline
+      placeholder: "Your shop in one sentence"
+
+  - type: dropdown
+    id: borough
+    attributes:
+      label: Borough *
+      options:
+        - Manhattan
+        - Brooklyn
+        - Queens
+        - Bronx
+        - Staten Island
+    validations:
+      required: true
+
+  - type: input
+    id: neighborhood
+    attributes:
+      label: Neighborhood *
+      placeholder: "e.g. Lower East Side"
+    validations:
+      required: true
+
+  - type: input
+    id: address
+    attributes:
+      label: Street Address *
+      placeholder: "46 Canal St, New York, NY 10002"
+    validations:
+      required: true
+
+  - type: input
+    id: lat
+    attributes:
+      label: Latitude *
+      placeholder: "40.7157"
+    validations:
+      required: true
+
+  - type: input
+    id: lng
+    attributes:
+      label: Longitude *
+      placeholder: "-73.9967"
+    validations:
+      required: true
+
+  - type: input
+    id: phone
+    attributes:
+      label: Phone
+      placeholder: "+12125551234"
+
+  - type: input
+    id: website
+    attributes:
+      label: Website
+      placeholder: "https://yourshop.com"
+
+  - type: input
+    id: instagram
+    attributes:
+      label: Instagram Handle
+      placeholder: "@yourshop"
+
+  - type: textarea
+    id: hours
+    attributes:
+      label: Hours of Operation *
+      description: "One line per day: day=HH:MM-HH:MM (or 'closed')"
+      value: |
+        monday=12:00-19:00
+        tuesday=12:00-19:00
+        wednesday=12:00-19:00
+        thursday=12:00-19:00
+        friday=12:00-19:00
+        saturday=11:00-19:00
+        sunday=12:00-18:00
+    validations:
+      required: true
+
+  - type: input
+    id: specialties
+    attributes:
+      label: Specialties
+      description: "Comma-separated list"
+      placeholder: "decks, wheels, apparel, local brands"
+
+  - type: input
+    id: vibes
+    attributes:
+      label: Vibes / Tags
+      description: "Comma-separated descriptors"
+      placeholder: "community-driven, old-school, family-friendly"
+
+  - type: input
+    id: team_riders
+    attributes:
+      label: Team Riders
+      description: "Comma-separated names"
+      placeholder: "Alex Corporan, Lurker Lou"
+
+  - type: textarea
+    id: story
+    attributes:
+      label: Your Shop's Story
+      placeholder: "Tell us about your shop..."
+
+  - type: dropdown
+    id: pos_system
+    attributes:
+      label: POS System
+      options:
+        - none
+        - square
+        - shopify
+        - lightspeed
+        - other
+
+  - type: dropdown
+    id: subscription_tier
+    attributes:
+      label: Subscription Tier
+      options:
+        - free
+        - basic
+        - pro
+        - enterprise

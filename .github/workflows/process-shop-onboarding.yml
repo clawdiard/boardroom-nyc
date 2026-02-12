@@ -1,0 +1,140 @@
+name: Process Shop Onboarding
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  process-shop:
+    if: contains(github.event.issue.labels.*.name, 'shop-onboarding')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse and validate shop submission
+        uses: actions/github-script@v7
+        id: parse
+        with:
+          script: |
+            const body = context.payload.issue.body;
+
+            function extract(id) {
+              // GitHub issue forms render as: ### Label\n\nvalue\n
+              const regex = new RegExp(`### [^\\n]*\\n\\n([\\s\\S]*?)(?=\\n###|$)`);
+              // Better: parse by field id from known order
+              return null;
+            }
+
+            // Parse GitHub issue form body — fields are rendered as:
+            // ### Label\n\n<value>\n
+            const sections = body.split(/\n### /).filter(Boolean);
+            const fields = {};
+            for (const section of sections) {
+              const lines = section.split('\n');
+              const label = lines[0].replace(/[*#]/g, '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
+              const value = lines.slice(1).join('\n').trim();
+              if (value && value !== '_No response_') fields[label] = value;
+            }
+
+            // Build shop JSON
+            const slug = fields.url_slug || fields.slug || '';
+            const hours = {};
+            if (fields.hours_of_operation) {
+              for (const line of fields.hours_of_operation.split('\n')) {
+                const match = line.match(/^(\w+)=(.+)$/);
+                if (match) hours[match[1]] = match[2].trim();
+              }
+            }
+            const csvToArr = (s) => s ? s.split(',').map(x => x.trim()).filter(Boolean) : [];
+
+            const shop = {
+              slug: slug,
+              name: fields.shop_name || '',
+              tagline: fields.tagline || '',
+              borough: fields.borough || '',
+              neighborhood: fields.neighborhood || '',
+              address: fields.street_address || '',
+              coordinates: {
+                lat: parseFloat(fields.latitude) || 0,
+                lng: parseFloat(fields.longitude) || 0
+              },
+              phone: fields.phone || '',
+              website: fields.website || '',
+              instagram: fields.instagram_handle || '',
+              hours: hours,
+              specialties: csvToArr(fields.specialties),
+              vibes: csvToArr(fields.vibes_tags),
+              team_riders: csvToArr(fields.team_riders),
+              story: fields.your_shop_s_story || '',
+              photos: [],
+              pos_system: fields.pos_system || 'none',
+              pos_api_enabled: false,
+              subscription_tier: fields.subscription_tier || 'free',
+              joined_date: new Date().toISOString().split('T')[0]
+            };
+
+            // Validate required fields
+            const errors = [];
+            if (!shop.slug || !/^[a-z0-9-]+$/.test(shop.slug)) errors.push('Invalid slug');
+            if (!shop.name) errors.push('Missing shop name');
+            if (!shop.borough) errors.push('Missing borough');
+            if (!shop.neighborhood) errors.push('Missing neighborhood');
+            if (!shop.address) errors.push('Missing address');
+            if (!shop.coordinates.lat || !shop.coordinates.lng) errors.push('Missing coordinates');
+            if (Object.keys(shop.hours).length === 0) errors.push('Missing hours');
+
+            core.setOutput('slug', shop.slug);
+            core.setOutput('shop_json', JSON.stringify(shop, null, 2));
+            core.setOutput('errors', JSON.stringify(errors));
+            core.setOutput('valid', errors.length === 0 ? 'true' : 'false');
+
+      - name: Reject invalid submission
+        if: steps.parse.outputs.valid == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const errors = JSON.parse('${{ steps.parse.outputs.errors }}'.replace(/'/g, "\\'"));
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              body: `❌ **Submission rejected — validation errors:**\n\n${errors.map(e => `- ${e}`).join('\n')}\n\nPlease fix and resubmit.`
+            });
+            await github.rest.issues.update({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              state: 'closed',
+              labels: ['shop-onboarding', 'invalid']
+            });
+
+      - name: Commit shop JSON
+        if: steps.parse.outputs.valid == 'true'
+        run: |
+          SLUG="${{ steps.parse.outputs.slug }}"
+          mkdir -p "data/shops"
+          mkdir -p "data/products/${SLUG}"
+          echo '${{ steps.parse.outputs.shop_json }}' > "data/shops/${SLUG}.json"
+          git config user.name "boardroom-bot"
+          git config user.email "bot@boardroomnyc.com"
+          git add "data/shops/${SLUG}.json" "data/products/${SLUG}"
+          git commit -m "feat: onboard shop ${SLUG} via form submission"
+          git push
+
+      - name: Close issue with success
+        if: steps.parse.outputs.valid == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              body: `✅ **Shop onboarded successfully!**\n\nYour shop profile has been added. The site will rebuild shortly.\n\nSlug: \`${{ steps.parse.outputs.slug }}\``
+            });
+            await github.rest.issues.update({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              state: 'closed',
+              labels: ['shop-onboarding', 'processed']
+            });

@@ -1,0 +1,168 @@
+name: Process Product Submission
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  process-products:
+    if: contains(github.event.issue.labels.*.name, 'product-submission')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse and validate product submission
+        uses: actions/github-script@v7
+        id: parse
+        with:
+          script: |
+            const body = context.payload.issue.body;
+            const fs = require('fs');
+
+            // Parse form fields
+            const sections = body.split(/\n### /).filter(Boolean);
+            const fields = {};
+            for (const section of sections) {
+              const lines = section.split('\n');
+              const label = lines[0].replace(/[*#]/g, '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
+              const value = lines.slice(1).join('\n').trim();
+              if (value && value !== '_No response_') fields[label] = value;
+            }
+
+            const shopSlug = fields.shop_slug || '';
+            const entryMode = fields.entry_mode || 'single';
+            const errors = [];
+            let products = [];
+
+            // Validate shop exists
+            const shopFile = `data/shops/${shopSlug}.json`;
+            if (!fs.existsSync(shopFile)) {
+              errors.push(`Shop '${shopSlug}' not found. Onboard your shop first.`);
+            }
+
+            if (errors.length === 0) {
+              if (entryMode === 'bulk') {
+                // Parse bulk JSON
+                let rawJson = fields.bulk_products_json || '';
+                // Strip markdown code fences
+                rawJson = rawJson.replace(/^```json?\n?/m, '').replace(/\n?```$/m, '').trim();
+                try {
+                  const parsed = JSON.parse(rawJson);
+                  if (!Array.isArray(parsed)) {
+                    errors.push('Bulk JSON must be an array');
+                  } else {
+                    products = parsed;
+                  }
+                } catch (e) {
+                  errors.push(`Invalid JSON: ${e.message}`);
+                }
+              } else {
+                // Single product
+                const name = fields.product_name || '';
+                const brand = fields.brand || '';
+                const category = fields.category || '';
+                const price = parseFloat(fields.price_usd_) || 0;
+                if (!name) errors.push('Missing product name');
+                if (!brand) errors.push('Missing brand');
+                if (!category) errors.push('Missing category');
+                if (!price) errors.push('Missing or invalid price');
+
+                if (errors.length === 0) {
+                  products.push({
+                    name, brand, category,
+                    subcategory: fields.subcategory || '',
+                    price,
+                    size: fields.size || '',
+                    in_stock: fields.in_stock_ === 'true',
+                    quantity: parseInt(fields.quantity) || 0,
+                    tags: fields.tags ? fields.tags.split(',').map(t => t.trim()).filter(Boolean) : []
+                  });
+                }
+              }
+            }
+
+            // Validate and build product objects
+            const finalProducts = [];
+            for (const p of products) {
+              if (!p.name || !p.brand || !p.category || !p.price) {
+                errors.push(`Product missing required fields: ${JSON.stringify(p)}`);
+                continue;
+              }
+              const id = p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '');
+              finalProducts.push({
+                id,
+                shop_slug: shopSlug,
+                name: p.name,
+                brand: p.brand,
+                category: p.category,
+                subcategory: p.subcategory || '',
+                price: p.price,
+                currency: 'USD',
+                size: p.size || '',
+                in_stock: p.in_stock !== false,
+                quantity: p.quantity || 0,
+                image: p.image || '',
+                url: p.url || '',
+                tags: p.tags || [],
+                last_updated: new Date().toISOString()
+              });
+            }
+
+            core.setOutput('shop_slug', shopSlug);
+            core.setOutput('products', JSON.stringify(finalProducts));
+            core.setOutput('count', finalProducts.length);
+            core.setOutput('errors', JSON.stringify(errors));
+            core.setOutput('valid', errors.length === 0 && finalProducts.length > 0 ? 'true' : 'false');
+
+      - name: Reject invalid submission
+        if: steps.parse.outputs.valid == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const errors = JSON.parse(`${{ steps.parse.outputs.errors }}`);
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              body: `❌ **Submission rejected:**\n\n${errors.map(e => `- ${e}`).join('\n')}\n\nPlease fix and resubmit.`
+            });
+            await github.rest.issues.update({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              state: 'closed',
+              labels: ['product-submission', 'invalid']
+            });
+
+      - name: Commit product files
+        if: steps.parse.outputs.valid == 'true'
+        run: |
+          SLUG="${{ steps.parse.outputs.shop_slug }}"
+          mkdir -p "data/products/${SLUG}"
+          echo '${{ steps.parse.outputs.products }}' | jq -c '.[]' | while read -r product; do
+            ID=$(echo "$product" | jq -r '.id')
+            echo "$product" | jq '.' > "data/products/${SLUG}/${ID}.json"
+          done
+          git config user.name "boardroom-bot"
+          git config user.email "bot@boardroomnyc.com"
+          git add "data/products/${SLUG}/"
+          git commit -m "feat: add ${{ steps.parse.outputs.count }} product(s) for ${SLUG} via form submission"
+          git push
+
+      - name: Close issue with success
+        if: steps.parse.outputs.valid == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              body: `✅ **${${{ steps.parse.outputs.count }}} product(s) added!**\n\nShop: \`${{ steps.parse.outputs.shop_slug }}\`\nThe site will rebuild shortly.`
+            });
+            await github.rest.issues.update({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              state: 'closed',
+              labels: ['product-submission', 'processed']
+            });

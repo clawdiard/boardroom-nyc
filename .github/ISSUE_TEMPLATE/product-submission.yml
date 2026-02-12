@@ -1,0 +1,118 @@
+name: Product Submission
+description: Add products to your shop's inventory on Board Room NYC
+title: "[Product Submission] "
+labels: ["product-submission", "automated"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Add Products to Your Inventory 🛹
+        Submit one or more products. For bulk entry, use the JSON format below.
+
+  - type: input
+    id: shop_slug
+    attributes:
+      label: Shop Slug *
+      description: "Your shop's URL slug (e.g. labor-skateshop)"
+      placeholder: "my-skate-shop"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: entry_mode
+    attributes:
+      label: Entry Mode *
+      description: "Single product via form fields, or bulk via JSON"
+      options:
+        - single
+        - bulk
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: "### Single Product Fields (skip if using bulk JSON)"
+
+  - type: input
+    id: product_name
+    attributes:
+      label: Product Name
+      placeholder: "Spitfire Formula Four 99D"
+
+  - type: input
+    id: brand
+    attributes:
+      label: Brand
+      placeholder: "Spitfire"
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - decks
+        - trucks
+        - wheels
+        - bearings
+        - griptape
+        - hardware
+        - apparel
+        - shoes
+        - accessories
+        - completes
+        - other
+
+  - type: input
+    id: subcategory
+    attributes:
+      label: Subcategory
+      placeholder: "street, cruiser, etc."
+
+  - type: input
+    id: price
+    attributes:
+      label: Price (USD)
+      placeholder: "38.00"
+
+  - type: input
+    id: size
+    attributes:
+      label: Size
+      placeholder: "53mm, 8.25, M, etc."
+
+  - type: dropdown
+    id: in_stock
+    attributes:
+      label: In Stock?
+      options:
+        - "true"
+        - "false"
+
+  - type: input
+    id: quantity
+    attributes:
+      label: Quantity
+      placeholder: "10"
+
+  - type: input
+    id: tags
+    attributes:
+      label: Tags
+      description: "Comma-separated"
+      placeholder: "street, classic"
+
+  - type: markdown
+    attributes:
+      value: "### Bulk JSON Entry"
+
+  - type: textarea
+    id: bulk_json
+    attributes:
+      label: Bulk Products JSON
+      description: "Array of product objects. Each needs: name, brand, category, price, in_stock. shop_slug and id are auto-set."
+      render: json
+      placeholder: |
+        [
+          {"name": "Deck A", "brand": "Brand", "category": "decks", "price": 60, "size": "8.25", "in_stock": true, "quantity": 5, "tags": ["street"]},
+          {"name": "Wheels B", "brand": "Brand2", "category": "wheels", "price": 40, "size": "54mm", "in_stock": true, "quantity": 12, "tags": ["park"]}
+        ]
