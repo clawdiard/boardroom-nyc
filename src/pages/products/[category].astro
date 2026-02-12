@@ -1,0 +1,89 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import { loadAllProducts, getCategories, formatPrice } from '../../utils/products';
+
+export function getStaticPaths() {
+  const categories = getCategories();
+  return categories.map(cat => ({ params: { category: cat } }));
+}
+
+const { category } = Astro.params;
+const allProducts = loadAllProducts();
+const products = allProducts.filter(p => p.category === category);
+const categories = getCategories();
+const base = import.meta.env.BASE_URL;
+
+const emoji: Record<string, string> = {
+  decks: '🛹', trucks: '⚙️', wheels: '⚫', bearings: '🔩',
+  apparel: '👕', griptape: '🖤', completes: '🎯'
+};
+---
+
+<Layout title={`${category} — Board Room NYC`}>
+  <main class="cat-page">
+    <h1>{emoji[category!] || '📦'} {category}</h1>
+    <p>{products.length} products</p>
+
+    <nav class="cat-nav">
+      {categories.map(c => (
+        <a href={`${base}products/${c}/`} class:list={['cat-tab', { active: c === category }]}>{c}</a>
+      ))}
+    </nav>
+
+    <div class="cat-grid">
+      {products.map(p => (
+        <div>
+          <ProductCard
+            name={p.name}
+            price={formatPrice(p.price)}
+            image={p.image || undefined}
+            brand={p.brand}
+            category={p.category}
+            href={p.url || `${base}shops/${p.shop_slug}/`}
+            soldOut={!p.in_stock}
+          />
+          <span class="shop-label">{p.shop_slug.replace(/-/g, ' ')}</span>
+        </div>
+      ))}
+    </div>
+
+    <a href={`${base}products/`} class="back-link">← All Products</a>
+  </main>
+</Layout>
+
+<style>
+  .cat-page { max-width: 1000px; margin: 0 auto; padding: var(--space-4); }
+  .cat-page h1 { text-transform: capitalize; }
+  .cat-nav { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-4) 0; }
+  .cat-tab {
+    padding: var(--space-1) var(--space-3);
+    background: var(--surface-card, #1a1a1a);
+    border: 1px solid var(--color-gray-700, #333);
+    color: var(--text-primary, #fff);
+    text-decoration: none;
+    text-transform: capitalize;
+    font-size: var(--text-sm);
+  }
+  .cat-tab.active, .cat-tab:hover {
+    border-color: var(--color-grip-yellow, #f0c040);
+    color: var(--color-grip-yellow, #f0c040);
+  }
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-4);
+  }
+  .shop-label {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    text-transform: capitalize;
+    margin-top: var(--space-1);
+  }
+  .back-link {
+    display: inline-block;
+    margin-top: var(--space-6);
+    color: var(--color-grip-yellow, #f0c040);
+  }
+</style>

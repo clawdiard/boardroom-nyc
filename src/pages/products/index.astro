@@ -1,0 +1,263 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import { loadAllProducts, getCategories, getBrands, getShopSlugs, formatPrice } from '../../utils/products';
+
+const products = loadAllProducts();
+const categories = getCategories();
+const brands = getBrands();
+const shops = getShopSlugs();
+const base = import.meta.env.BASE_URL;
+
+// Find the most recent last_updated across all products
+const lastUpdated = products.reduce((latest, p) => {
+  const d = new Date(p.last_updated);
+  return d > latest ? d : latest;
+}, new Date(0));
+---
+
+<Layout title="Product Catalog — Board Room NYC">
+  <main class="catalog">
+    <div class="catalog__header">
+      <h1>🛹 Product Catalog</h1>
+      <p>Browse gear from NYC's best skate shops. <strong>{products.length}</strong> products across <strong>{shops.length}</strong> shops.</p>
+      <p class="catalog__updated">Last updated: {lastUpdated.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+    </div>
+
+    <div id="search-box" class="catalog__search">
+      <input type="text" id="product-search" placeholder="Search products..." autocomplete="off" />
+    </div>
+
+    <div class="catalog__layout">
+      <aside class="catalog__filters" id="filters">
+        <h3>Filters</h3>
+
+        <fieldset>
+          <legend>Category</legend>
+          {categories.map(cat => (
+            <label>
+              <input type="checkbox" name="category" value={cat} checked />
+              {cat}
+            </label>
+          ))}
+        </fieldset>
+
+        <fieldset>
+          <legend>Shop</legend>
+          {shops.map(s => (
+            <label>
+              <input type="checkbox" name="shop" value={s} checked />
+              {s.replace(/-/g, ' ')}
+            </label>
+          ))}
+        </fieldset>
+
+        <fieldset>
+          <legend>Brand</legend>
+          {brands.map(b => (
+            <label>
+              <input type="checkbox" name="brand" value={b} checked />
+              {b}
+            </label>
+          ))}
+        </fieldset>
+
+        <fieldset>
+          <legend>Price Range</legend>
+          <div class="price-range">
+            <input type="number" id="price-min" placeholder="Min" min="0" />
+            <span>—</span>
+            <input type="number" id="price-max" placeholder="Max" min="0" />
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Availability</legend>
+          <label><input type="checkbox" id="in-stock-only" /> In stock only</label>
+        </fieldset>
+      </aside>
+
+      <section class="catalog__grid" id="product-grid">
+        {products.map(p => (
+          <div class="product-item"
+            data-category={p.category}
+            data-shop={p.shop_slug}
+            data-brand={p.brand}
+            data-price={p.price}
+            data-stock={p.in_stock ? 'true' : 'false'}
+            data-name={p.name.toLowerCase()}
+          >
+            <ProductCard
+              name={p.name}
+              price={formatPrice(p.price)}
+              image={p.image || undefined}
+              brand={p.brand}
+              category={p.category}
+              href={p.url || `${base}shops/${p.shop_slug}/`}
+              soldOut={!p.in_stock}
+            />
+            <span class="product-item__shop">{p.shop_slug.replace(/-/g, ' ')}</span>
+          </div>
+        ))}
+      </section>
+    </div>
+
+    <nav class="catalog__categories">
+      <h2>Browse by Category</h2>
+      <div class="cat-links">
+        {categories.map(cat => (
+          <a href={`${base}products/${cat}/`} class="cat-link">
+            {cat === 'decks' ? '🛹' : cat === 'trucks' ? '⚙️' : cat === 'wheels' ? '⚫' : cat === 'bearings' ? '🔩' : cat === 'apparel' ? '👕' : cat === 'griptape' ? '🖤' : cat === 'completes' ? '🎯' : '📦'}
+            {cat}
+          </a>
+        ))}
+      </div>
+    </nav>
+  </main>
+</Layout>
+
+<script>
+  const grid = document.getElementById('product-grid')!;
+  const items = Array.from(grid.querySelectorAll('.product-item')) as HTMLElement[];
+  const filters = document.getElementById('filters')!;
+  const searchInput = document.getElementById('product-search') as HTMLInputElement;
+  const priceMin = document.getElementById('price-min') as HTMLInputElement;
+  const priceMax = document.getElementById('price-max') as HTMLInputElement;
+  const stockOnly = document.getElementById('in-stock-only') as HTMLInputElement;
+
+  function getChecked(name: string): Set<string> {
+    const boxes = filters.querySelectorAll(`input[name="${name}"]:checked`) as NodeListOf<HTMLInputElement>;
+    return new Set(Array.from(boxes).map(b => b.value));
+  }
+
+  function applyFilters() {
+    const cats = getChecked('category');
+    const shopSet = getChecked('shop');
+    const brandSet = getChecked('brand');
+    const min = priceMin.value ? parseFloat(priceMin.value) : 0;
+    const max = priceMax.value ? parseFloat(priceMax.value) : Infinity;
+    const inStockOnly = stockOnly.checked;
+    const query = searchInput.value.toLowerCase().trim();
+
+    for (const item of items) {
+      const cat = item.dataset.category!;
+      const shop = item.dataset.shop!;
+      const brand = item.dataset.brand!;
+      const price = parseFloat(item.dataset.price!);
+      const inStock = item.dataset.stock === 'true';
+      const name = item.dataset.name!;
+
+      const show =
+        cats.has(cat) &&
+        shopSet.has(shop) &&
+        brandSet.has(brand) &&
+        price >= min && price <= max &&
+        (!inStockOnly || inStock) &&
+        (!query || name.includes(query) || brand.toLowerCase().includes(query) || cat.includes(query));
+
+      item.style.display = show ? '' : 'none';
+    }
+  }
+
+  filters.addEventListener('change', applyFilters);
+  searchInput.addEventListener('input', applyFilters);
+  priceMin.addEventListener('input', applyFilters);
+  priceMax.addEventListener('input', applyFilters);
+</script>
+
+<style>
+  .catalog { max-width: 1200px; margin: 0 auto; padding: var(--space-4); }
+  .catalog__header { margin-bottom: var(--space-6); }
+  .catalog__header h1 { margin: 0; }
+  .catalog__updated { font-size: var(--text-sm); color: var(--text-muted); }
+
+  .catalog__search { margin-bottom: var(--space-4); }
+  .catalog__search input {
+    width: 100%;
+    padding: var(--space-3);
+    font-size: var(--text-md);
+    background: var(--surface-card, #1a1a1a);
+    border: 2px solid var(--color-gray-700, #333);
+    color: var(--text-primary, #fff);
+    font-family: var(--font-display, monospace);
+  }
+  .catalog__search input:focus {
+    outline: none;
+    border-color: var(--color-grip-yellow, #f0c040);
+  }
+
+  .catalog__layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: var(--space-6);
+  }
+  @media (max-width: 768px) {
+    .catalog__layout { grid-template-columns: 1fr; }
+  }
+
+  .catalog__filters h3 { margin-top: 0; }
+  .catalog__filters fieldset {
+    border: 1px solid var(--color-gray-700, #333);
+    padding: var(--space-2) var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+  .catalog__filters legend {
+    font-family: var(--font-display, monospace);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    padding: 0 var(--space-1);
+  }
+  .catalog__filters label {
+    display: block;
+    font-size: var(--text-sm);
+    padding: var(--space-1) 0;
+    text-transform: capitalize;
+    cursor: pointer;
+  }
+  .price-range {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .price-range input {
+    width: 70px;
+    padding: var(--space-1);
+    background: var(--surface-card, #1a1a1a);
+    border: 1px solid var(--color-gray-700, #333);
+    color: var(--text-primary, #fff);
+  }
+
+  .catalog__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .product-item__shop {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    text-transform: capitalize;
+    margin-top: var(--space-1);
+    padding-left: var(--space-1);
+  }
+
+  .catalog__categories { margin-top: var(--space-8); }
+  .cat-links { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-3); }
+  .cat-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--surface-card, #1a1a1a);
+    border: 2px solid var(--color-gray-700, #333);
+    color: var(--text-primary, #fff);
+    text-decoration: none;
+    text-transform: capitalize;
+    font-family: var(--font-display, monospace);
+    font-weight: 600;
+  }
+  .cat-link:hover {
+    border-color: var(--color-grip-yellow, #f0c040);
+  }
+</style>
