@@ -1,0 +1,21 @@
+{
+  "name": "Board Room NYC",
+  "short_name": "BoardRoom",
+  "description": "Your guide to NYC's skateboard scene",
+  "start_url": "/boardroom-nyc/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "/boardroom-nyc/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/boardroom-nyc/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
