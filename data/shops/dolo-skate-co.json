@@ -1,0 +1,30 @@
+{
+  "slug": "dolo-skate-co",
+  "name": "Dolo Skate Co",
+  "tagline": "The Bronx rides",
+  "borough": "Bronx",
+  "neighborhood": "South Bronx",
+  "address": "349 E 149th St, Bronx, NY 10451",
+  "coordinates": { "lat": 40.8182, "lng": -73.9210 },
+  "phone": "",
+  "website": "",
+  "instagram": "@doloskate",
+  "hours": {
+    "monday": "closed",
+    "tuesday": "12:00-19:00",
+    "wednesday": "12:00-19:00",
+    "thursday": "12:00-19:00",
+    "friday": "12:00-20:00",
+    "saturday": "11:00-20:00",
+    "sunday": "12:00-18:00"
+  },
+  "specialties": ["decks", "hardware", "local brand apparel"],
+  "vibes": ["grassroots", "Bronx pride", "street culture"],
+  "team_riders": [],
+  "story": "Repping the Bronx skate scene. Dolo keeps the borough's riders rolling with quality gear and a no-nonsense attitude.",
+  "photos": [],
+  "pos_system": "square",
+  "pos_api_enabled": false,
+  "subscription_tier": "basic",
+  "joined_date": "2026-02-01"
+}

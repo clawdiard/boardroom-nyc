@@ -1,0 +1,31 @@
+{
+  "slug": "kcdc-skateshop",
+  "name": "KCDC Skateshop",
+  "tagline": "Serving the Brooklyn skate community since 2001",
+  "borough": "Brooklyn",
+  "neighborhood": "Bushwick",
+  "address": "Online Only (Brooklyn-based)",
+  "coordinates": { "lat": 40.6944, "lng": -73.9213 },
+  "phone": "",
+  "website": "https://kcdcskateshop.com",
+  "instagram": "@kcdcskateshop",
+  "hours": {
+    "monday": "online",
+    "tuesday": "online",
+    "wednesday": "online",
+    "thursday": "online",
+    "friday": "online",
+    "saturday": "online",
+    "sunday": "online"
+  },
+  "specialties": ["decks", "shoes", "apparel", "inclusive community"],
+  "vibes": ["inclusive", "community-driven", "Brooklyn-born"],
+  "team_riders": ["Jessyka Bailey", "Reina Lanfield"],
+  "story": "Brooklyn-born and community-first since 2001. KCDC has been a safe and inclusive space for everyone with over 23 years of experience. Now fully online, continuing to serve the skate community.",
+  "photos": [],
+  "pos_system": "shopify",
+  "pos_api_enabled": true,
+  "subscription_tier": "basic",
+  "joined_date": "2026-02-01",
+  "online_only": true
+}

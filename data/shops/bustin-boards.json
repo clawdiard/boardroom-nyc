@@ -1,0 +1,30 @@
+{
+  "slug": "bustin-boards",
+  "name": "Bustin Boards",
+  "tagline": "Skate Everything",
+  "borough": "Brooklyn",
+  "neighborhood": "Williamsburg",
+  "address": "11 Broadway, Brooklyn, NY 11249",
+  "coordinates": { "lat": 40.7101, "lng": -73.9654 },
+  "phone": "+17182184104",
+  "website": "https://bustinboards.com",
+  "instagram": "@bustinboards",
+  "hours": {
+    "monday": "11:00-19:00",
+    "tuesday": "11:00-19:00",
+    "wednesday": "11:00-19:00",
+    "thursday": "11:00-19:00",
+    "friday": "11:00-20:00",
+    "saturday": "10:00-20:00",
+    "sunday": "11:00-18:00"
+  },
+  "specialties": ["longboards", "push boards", "electric boards", "accessories"],
+  "vibes": ["longboard-focused", "innovative", "heritage brand"],
+  "team_riders": [],
+  "story": "For 23 years, Bustin has been building history, championing skate communities, and defining what it means to skate everything. Known for their Shrike, Maestro, and Sportster lines.",
+  "photos": [],
+  "pos_system": "shopify",
+  "pos_api_enabled": true,
+  "subscription_tier": "pro",
+  "joined_date": "2026-02-01"
+}
