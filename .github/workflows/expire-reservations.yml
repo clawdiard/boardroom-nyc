@@ -1,0 +1,48 @@
+name: Expire Reservations
+on:
+  schedule:
+    - cron: '0 * * * *'  # Every hour
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  expire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check and expire old reservations
+        run: |
+          NOW=$(date -u +%s)
+          CHANGED=0
+
+          for file in data/products/*/*.json; do
+            STATUS=$(jq -r '.status // "available"' "$file")
+            RESERVED_AT=$(jq -r '.reserved_at // ""' "$file")
+
+            if [ "$STATUS" = "reserved" ] && [ -n "$RESERVED_AT" ]; then
+              RESERVED_TS=$(date -u -d "$RESERVED_AT" +%s 2>/dev/null || echo 0)
+              AGE=$(( NOW - RESERVED_TS ))
+
+              if [ "$AGE" -gt 86400 ]; then
+                echo "Expiring: $file (reserved $AGE seconds ago)"
+                jq 'del(.status, .reserved_at)' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+                CHANGED=1
+              fi
+            fi
+          done
+
+          echo "changed=$CHANGED" >> "$GITHUB_OUTPUT"
+        id: expire
+
+      - name: Commit and push
+        if: steps.expire.outputs.changed == '1'
+        run: |
+          git config user.name "boardroom-bot"
+          git config user.email "bot@boardroom-nyc.com"
+          git add data/
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "expire: reset reservations older than 24h"
+          git push
