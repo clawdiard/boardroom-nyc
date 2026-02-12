@@ -20,7 +20,31 @@ const emoji: Record<string, string> = {
 };
 ---
 
-<Layout title={`${category} — Board Room NYC`}>
+<Layout title={`${category.charAt(0).toUpperCase() + category.slice(1)} — Buy Skateboard ${category.charAt(0).toUpperCase() + category.slice(1)} NYC | Board Room NYC`} description={`Shop ${products.length} ${category} from NYC skate shops. Compare brands and prices for the best skateboard ${category} in New York City.`}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": `Skateboard ${category}`,
+      "numberOfItems": products.length,
+      "itemListElement": products.map((p, i) => ({
+        "@type": "ListItem",
+        "position": i + 1,
+        "item": {
+          "@type": "Product",
+          "name": p.name,
+          "brand": { "@type": "Brand", "name": p.brand },
+          "category": p.category,
+          "offers": {
+            "@type": "Offer",
+            "price": p.price,
+            "priceCurrency": "USD",
+            "availability": p.in_stock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+          }
+        }
+      }))
+    })} />
+  </Fragment>
   <main class="cat-page">
     <h1>{emoji[category!] || '📦'} {category}</h1>
     <p>{products.length} products</p>

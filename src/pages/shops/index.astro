@@ -18,6 +18,24 @@ const specialties = getSpecialties(shops);
 ---
 
 <Layout title="Shops — Board Room NYC" description="Browse NYC's best skate shops. Filter by borough and specialty.">
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "NYC Skate Shops",
+      "numberOfItems": shops.length,
+      "itemListElement": shops.map((s, i) => ({
+        "@type": "ListItem",
+        "position": i + 1,
+        "item": {
+          "@type": "LocalBusiness",
+          "name": s.name,
+          "address": { "@type": "PostalAddress", "streetAddress": s.address, "addressLocality": "New York", "addressRegion": "NY" },
+          "url": s.website
+        }
+      }))
+    })} />
+  </Fragment>
   <main class="shops-page">
     <header class="shops-header">
       <h1>NYC Skate Shops</h1>
