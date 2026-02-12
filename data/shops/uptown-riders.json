@@ -5,9 +5,11 @@
   "borough": "Manhattan",
   "neighborhood": "Harlem",
   "address": "2144 Frederick Douglass Blvd, New York, NY 10026",
-  "coordinates": { "lat": 40.8028, "lng": -73.9558 },
+  "coordinates": {
+    "lat": 40.8028,
+    "lng": -73.9558
+  },
   "phone": "+12125551234",
-  "website": "",
   "instagram": "@uptownridersnyc",
   "hours": {
     "monday": "12:00-19:00",
@@ -18,8 +20,17 @@
     "saturday": "11:00-20:00",
     "sunday": "12:00-18:00"
   },
-  "specialties": ["decks", "wheels", "trucks", "community events"],
-  "vibes": ["uptown culture", "community hub", "welcoming"],
+  "specialties": [
+    "decks",
+    "wheels",
+    "trucks",
+    "community events"
+  ],
+  "vibes": [
+    "uptown culture",
+    "community hub",
+    "welcoming"
+  ],
   "team_riders": [],
   "story": "Bringing skateboarding uptown. A community hub for Harlem skaters with events, workshops, and all the gear you need.",
   "photos": [],

@@ -6,6 +6,73 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
+          -73.9654,
+          40.7101
+        ]
+      },
+      "properties": {
+        "name": "Bustin Boards",
+        "slug": "bustin-boards",
+        "address": "11 Broadway, Brooklyn, NY 11249",
+        "borough": "Brooklyn",
+        "neighborhood": "Williamsburg",
+        "specialties": [
+          "longboards",
+          "push boards",
+          "electric boards",
+          "accessories"
+        ],
+        "website": "https://bustinboards.com",
+        "hours": {
+          "monday": "11:00-19:00",
+          "tuesday": "11:00-19:00",
+          "wednesday": "11:00-19:00",
+          "thursday": "11:00-19:00",
+          "friday": "11:00-20:00",
+          "saturday": "10:00-20:00",
+          "sunday": "11:00-18:00"
+        },
+        "todayHours": "11:00-19:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.921,
+          40.8182
+        ]
+      },
+      "properties": {
+        "name": "Dolo Skate Co",
+        "slug": "dolo-skate-co",
+        "address": "349 E 149th St, Bronx, NY 10451",
+        "borough": "Bronx",
+        "neighborhood": "South Bronx",
+        "specialties": [
+          "decks",
+          "hardware",
+          "local brand apparel"
+        ],
+        "website": "",
+        "hours": {
+          "monday": "closed",
+          "tuesday": "12:00-19:00",
+          "wednesday": "12:00-19:00",
+          "thursday": "12:00-19:00",
+          "friday": "12:00-20:00",
+          "saturday": "11:00-20:00",
+          "sunday": "12:00-18:00"
+        },
+        "todayHours": "12:00-19:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
           -73.9198,
           40.7005
         ]
@@ -33,6 +100,40 @@
           "sunday": "11:00-19:00"
         },
         "todayHours": "12:00-20:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.9213,
+          40.6944
+        ]
+      },
+      "properties": {
+        "name": "KCDC Skateshop",
+        "slug": "kcdc-skateshop",
+        "address": "Online Only (Brooklyn-based)",
+        "borough": "Brooklyn",
+        "neighborhood": "Bushwick",
+        "specialties": [
+          "decks",
+          "shoes",
+          "apparel",
+          "inclusive community"
+        ],
+        "website": "https://kcdcskateshop.com",
+        "hours": {
+          "monday": "online",
+          "tuesday": "online",
+          "wednesday": "online",
+          "thursday": "online",
+          "friday": "online",
+          "saturday": "online",
+          "sunday": "online"
+        },
+        "todayHours": "online"
       }
     },
     {
@@ -74,6 +175,40 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
+          -73.8567,
+          40.6904
+        ]
+      },
+      "properties": {
+        "name": "Seasons Skate Shop",
+        "slug": "seasons-skateshop",
+        "address": "86-56 Jamaica Ave, Woodhaven, NY 11421",
+        "borough": "Queens",
+        "neighborhood": "Woodhaven",
+        "specialties": [
+          "decks",
+          "apparel",
+          "streetwear",
+          "shoes"
+        ],
+        "website": "https://seasonsskateshop.com",
+        "hours": {
+          "monday": "12:00-19:00",
+          "tuesday": "12:00-19:00",
+          "wednesday": "12:00-19:00",
+          "thursday": "12:00-19:00",
+          "friday": "12:00-20:00",
+          "saturday": "11:00-20:00",
+          "sunday": "11:00-18:00"
+        },
+        "todayHours": "12:00-19:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
           -73.9996,
           40.7318
         ]
@@ -101,6 +236,40 @@
           "sunday": "11:00-18:00"
         },
         "todayHours": "11:00-19:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.9558,
+          40.8028
+        ]
+      },
+      "properties": {
+        "name": "Uptown Riders",
+        "slug": "uptown-riders",
+        "address": "2144 Frederick Douglass Blvd, New York, NY 10026",
+        "borough": "Manhattan",
+        "neighborhood": "Harlem",
+        "specialties": [
+          "decks",
+          "wheels",
+          "trucks",
+          "community events"
+        ],
+        "website": "",
+        "hours": {
+          "monday": "12:00-19:00",
+          "tuesday": "12:00-19:00",
+          "wednesday": "12:00-19:00",
+          "thursday": "12:00-19:00",
+          "friday": "12:00-20:00",
+          "saturday": "11:00-20:00",
+          "sunday": "12:00-18:00"
+        },
+        "todayHours": "12:00-19:00"
       }
     }
   ]

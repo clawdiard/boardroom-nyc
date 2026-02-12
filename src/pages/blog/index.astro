@@ -1,0 +1,64 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const guides = await getCollection('guides');
+const features = await getCollection('features');
+
+const allPosts = [
+  ...guides.map(g => ({ ...g, kind: 'guide' as const })),
+  ...features.map(f => ({ ...f, kind: 'feature' as const })),
+].sort((a, b) => new Date(b.data.publishedDate).getTime() - new Date(a.data.publishedDate).getTime());
+---
+
+<Layout title="Blog — Board Room NYC" description="Guides, features, and stories from NYC's skateboard scene." currentPath="/blog">
+  <main class="blog-index">
+    <section class="hero">
+      <h1>Blog</h1>
+      <p>Borough guides, board features, and stories from NYC's skate scene.</p>
+    </section>
+
+    <section class="posts-grid">
+      {allPosts.map(post => (
+        <article class="post-card">
+          <div class="post-meta">
+            <span class={`badge badge--${post.kind}`}>{post.kind === 'guide' ? '📍 Guide' : '🛹 Feature'}</span>
+            <time datetime={post.data.publishedDate}>{new Date(post.data.publishedDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</time>
+          </div>
+          <h2><a href={`/boardroom-nyc/${post.kind === 'guide' ? 'guides' : 'blog'}/${post.data.slug}/`}>{post.data.title}</a></h2>
+          <p>{post.data.description}</p>
+          {post.data.tags && (
+            <div class="tags">
+              {post.data.tags.map(tag => <span class="tag">#{tag}</span>)}
+            </div>
+          )}
+        </article>
+      ))}
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .blog-index { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; }
+  .hero { text-align: center; margin-bottom: 3rem; }
+  .hero h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .hero p { color: var(--color-text-muted, #888); font-size: 1.1rem; }
+  .posts-grid { display: flex; flex-direction: column; gap: 2rem; }
+  .post-card {
+    background: var(--color-surface, #1e1e3a);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--color-border, #333);
+  }
+  .post-meta { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; font-size: 0.85rem; }
+  .badge { padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+  .badge--guide { background: #2d6a4f; color: #b7e4c7; }
+  .badge--feature { background: #7b2cbf; color: #e0aaff; }
+  time { color: var(--color-text-muted, #888); }
+  .post-card h2 { margin: 0 0 0.5rem; font-size: 1.3rem; }
+  .post-card h2 a { color: inherit; text-decoration: none; }
+  .post-card h2 a:hover { text-decoration: underline; }
+  .post-card p { color: var(--color-text-muted, #aaa); margin: 0 0 0.75rem; }
+  .tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .tag { font-size: 0.8rem; color: var(--color-text-muted, #888); }
+</style>

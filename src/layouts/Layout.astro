@@ -23,6 +23,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <link rel="canonical" href={canonicalURL.href} />
     <link rel="icon" type="image/svg+xml" href="/boardroom-nyc/favicon.svg" />
     <link rel="manifest" href="/boardroom-nyc/manifest.json" />
+    <link rel="alternate" type="application/rss+xml" title="Board Room NYC" href="/boardroom-nyc/feed.xml" />
     <meta name="theme-color" content="#1a1a2e" />
     <!-- Open Graph -->
     <meta property="og:title" content={title} />

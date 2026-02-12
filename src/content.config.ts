@@ -65,4 +65,35 @@ const events = defineCollection({
   }),
 });
 
-export const collections = { shops, products, events };
+const guides = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './content/blog-guides' }),
+  schema: z.object({
+    title: z.string(),
+    slug: z.string(),
+    description: z.string(),
+    borough: z.string().optional(),
+    publishedDate: z.string(),
+    updatedDate: z.string().optional(),
+    author: z.string(),
+    tags: z.array(z.string()).optional(),
+    featured: z.boolean().optional(),
+  }),
+});
+
+const features = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './content/features' }),
+  schema: z.object({
+    title: z.string(),
+    slug: z.string(),
+    description: z.string(),
+    type: z.string().optional(),
+    publishedDate: z.string(),
+    updatedDate: z.string().optional(),
+    author: z.string(),
+    tags: z.array(z.string()).optional(),
+    productId: z.string().optional(),
+    shopSlug: z.string().optional(),
+  }),
+});
+
+export const collections = { shops, products, events, guides, features };

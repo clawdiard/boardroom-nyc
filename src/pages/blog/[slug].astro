@@ -1,0 +1,52 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const features = await getCollection('features');
+  return features.map(feature => ({
+    params: { slug: feature.data.slug },
+    props: { feature },
+  }));
+}
+
+const { feature } = Astro.props;
+const { Content } = await render(feature);
+---
+
+<Layout title={feature.data.title} description={feature.data.description} currentPath={`/blog/${feature.data.slug}`} ogType="article">
+  <main class="feature-page">
+    <article>
+      <header>
+        <span class="badge">🛹 Feature</span>
+        <h1>{feature.data.title}</h1>
+        <p class="description">{feature.data.description}</p>
+        <div class="meta">
+          <time datetime={feature.data.publishedDate}>Published {new Date(feature.data.publishedDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</time>
+        </div>
+      </header>
+      <div class="content">
+        <Content />
+      </div>
+      <footer>
+        <a href="/boardroom-nyc/blog/">← Back to all posts</a>
+      </footer>
+    </article>
+  </main>
+</Layout>
+
+<style>
+  .feature-page { max-width: 720px; margin: 0 auto; padding: 2rem 1rem; }
+  .badge { background: #7b2cbf; color: #e0aaff; padding: 2px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; }
+  header { margin-bottom: 2rem; }
+  h1 { font-size: 2.2rem; margin: 1rem 0 0.5rem; line-height: 1.2; }
+  .description { color: var(--color-text-muted, #aaa); font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .meta { color: var(--color-text-muted, #888); font-size: 0.85rem; }
+  .content { line-height: 1.7; }
+  .content :global(h2) { margin-top: 2.5rem; font-size: 1.5rem; }
+  .content :global(h3) { margin-top: 1.5rem; }
+  .content :global(hr) { border: none; border-top: 1px solid var(--color-border, #333); margin: 2rem 0; }
+  .content :global(a) { color: var(--color-accent, #7c3aed); }
+  footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border, #333); }
+  footer a { color: var(--color-accent, #7c3aed); text-decoration: none; }
+</style>
