@@ -59,7 +59,7 @@ const boroughs = [...new Set(spots.map(s => s.borough))].sort();
         if (s.coordinates) {
           L.marker([s.coordinates.lat, s.coordinates.lng])
             .addTo(map)
-            .bindPopup(`<b>${s.name}</b><br>${s.neighborhood}<br><a href="${base}/spots/${s.slug}/">View Guide →</a>`);
+            .bindPopup(`<b>${s.name}</b><br>${s.neighborhood}<br><a href="${base}spots/${s.slug}/">View Guide →</a>`);
         }
       });
     };

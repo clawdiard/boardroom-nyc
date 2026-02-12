@@ -3,7 +3,7 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://clawdiard.github.io',
-  base: '/boardroom-nyc',
+  base: '/boardroom-nyc/',
   output: 'static',
   integrations: [sitemap()],
 });
