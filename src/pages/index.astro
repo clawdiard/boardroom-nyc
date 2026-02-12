@@ -1,34 +1,544 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ShopCard from '../components/ShopCard.astro';
+import Button from '../components/Button.astro';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+// Load homepage config
+const homepageRaw = readFileSync(resolve(process.cwd(), 'data/homepage.json'), 'utf-8');
+const homepage = JSON.parse(homepageRaw);
+
+// Load featured shops
+const shopFiles = import.meta.glob('../../../data/shops/*.json', { eager: true }) as Record<string, { default: any }>;
+// Fallback: read from fs
+const featuredShops = homepage.featured_shops.map((slug: string) => {
+  const raw = readFileSync(resolve(process.cwd(), `data/shops/${slug}.json`), 'utf-8');
+  return JSON.parse(raw);
+});
+
+// Load board of the week product
+const botwRaw = readFileSync(resolve(process.cwd(), `data/products/${homepage.board_of_the_week.shop_slug}/${homepage.board_of_the_week.product_slug}.json`), 'utf-8');
+const boardOfTheWeek = JSON.parse(botwRaw);
+const botwShop = featuredShops.find((s: any) => s.slug === homepage.board_of_the_week.shop_slug) ||
+  JSON.parse(readFileSync(resolve(process.cwd(), `data/shops/${homepage.board_of_the_week.shop_slug}.json`), 'utf-8'));
 ---
 
-<Layout title="Board Room NYC — NYC Skate Shop Directory & Gear Catalog" description="Your complete guide to NYC's skateboard scene. Browse skate shops, compare gear, and find the best spots across all five boroughs.">
-  <main>
-    <h1>🛹 Board Room NYC</h1>
-    <p>Your guide to NYC's skateboard scene — shops, gear, events, and more.</p>
-    <nav class="home-nav">
-      <a href={`${import.meta.env.BASE_URL}shops/`}>Browse Shops</a>
-      <a href={`${import.meta.env.BASE_URL}products/`}>🛹 Product Catalog</a>
-      <a href={`${import.meta.env.BASE_URL}map/`}>🗺️ Shop Map</a>
-    </nav>
-  </main>
+<Layout title="Board Room NYC — Every NYC Skate Shop. One Place." description={homepage.hero.subheadline}>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <h1 class="hero-headline">{homepage.hero.headline}</h1>
+      <p class="hero-sub">{homepage.hero.subheadline}</p>
+      <form class="hero-search" action={`${import.meta.env.BASE_URL}shops/`} method="get">
+        <input type="search" name="q" placeholder="Search shops, products, brands..." aria-label="Search" class="hero-search-input" />
+        <button type="submit" class="hero-search-btn">🔍</button>
+      </form>
+      <div class="hero-ctas">
+        <a href={homepage.hero.cta_primary.href} class="btn btn-primary">{homepage.hero.cta_primary.text}</a>
+        <a href={homepage.hero.cta_secondary.href} class="btn btn-secondary">{homepage.hero.cta_secondary.text}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORY QUICK LINKS -->
+  <section class="categories">
+    <div class="container">
+      <div class="category-grid">
+        {homepage.categories.map((cat: any) => (
+          <a href={cat.href} class="category-card">
+            <span class="category-icon">{cat.icon}</span>
+            <span class="category-name">{cat.name}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED SHOPS -->
+  <section class="featured-shops">
+    <div class="container">
+      <h2 class="section-title">Featured Shops</h2>
+      <div class="shops-grid">
+        {featuredShops.map((shop: any) => (
+          <a href={`${import.meta.env.BASE_URL}shops/${shop.slug}/`} class="featured-shop-card">
+            <div class="fsc-header">
+              <h3>{shop.name}</h3>
+              <span class="fsc-borough">{shop.borough}</span>
+            </div>
+            <p class="fsc-tagline">{shop.tagline}</p>
+            <p class="fsc-neighborhood">📍 {shop.neighborhood}</p>
+            <div class="fsc-specialties">
+              {shop.specialties.slice(0, 3).map((s: string) => (
+                <span class="badge">{s}</span>
+              ))}
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- MAP PREVIEW -->
+  <section class="map-preview">
+    <div class="container">
+      <h2 class="section-title">Find Shops Near You</h2>
+      <p class="section-sub">All NYC skate shops plotted on an interactive map.</p>
+      <a href={`${import.meta.env.BASE_URL}map/`} class="map-preview-link">
+        <div class="map-placeholder">
+          <span class="map-placeholder-icon">🗺️</span>
+          <span class="map-placeholder-text">Open Interactive Map →</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- BOARD OF THE WEEK -->
+  <section class="board-of-week">
+    <div class="container">
+      <h2 class="section-title">🛹 Board of the Week</h2>
+      <div class="botw-card">
+        <div class="botw-visual">
+          <div class="botw-placeholder-img">🛹</div>
+        </div>
+        <div class="botw-info">
+          <h3>{boardOfTheWeek.name}</h3>
+          <p class="botw-price">${boardOfTheWeek.price}</p>
+          <p class="botw-shop">from <strong>{botwShop.name}</strong></p>
+          <p class="botw-blurb">{homepage.board_of_the_week.blurb}</p>
+          <a href={`${import.meta.env.BASE_URL}shops/${botwShop.slug}/`} class="btn btn-primary">Shop Now</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about">
+    <div class="container">
+      <h2 class="section-title">{homepage.about.title}</h2>
+      <p class="about-text">{homepage.about.text}</p>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section class="newsletter">
+    <div class="container">
+      <h2 class="section-title">{homepage.newsletter.heading}</h2>
+      <p class="section-sub">{homepage.newsletter.subheading}</p>
+      <form class="newsletter-form" action={homepage.newsletter.form_action || '#'} method="post">
+        <input type="email" name="email" placeholder="your@email.com" required aria-label="Email address" class="newsletter-input" />
+        <button type="submit" class="btn btn-primary">Subscribe</button>
+      </form>
+    </div>
+  </section>
+
 </Layout>
 
 <style>
-  .home-nav {
+  /* ---- HERO ---- */
+  .hero {
+    background: var(--surface-primary);
+    padding: var(--space-16) var(--space-5) var(--space-12);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(233,69,96,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: var(--container-md);
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    color: var(--text-primary);
+    text-transform: uppercase;
+    margin: 0 0 var(--space-4);
+  }
+  .hero-sub {
+    font-size: var(--text-md);
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-6);
+    line-height: var(--leading-normal);
+  }
+  .hero-search {
     display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
+    max-width: 480px;
+    margin: 0 auto var(--space-6);
+    border: 2px solid var(--color-gray-600);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color var(--transition-fast);
   }
-  .home-nav a {
-    padding: 0.6rem 1.2rem;
-    background: var(--color-primary, #222);
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
+  .hero-search:focus-within {
+    border-color: var(--color-crimson);
+    box-shadow: var(--shadow-glow);
+  }
+  .hero-search-input {
+    flex: 1;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-gray-800);
+    color: var(--text-primary);
+    border: none;
+    font-size: var(--text-base);
+    outline: none;
+  }
+  .hero-search-input::placeholder {
+    color: var(--text-muted);
+  }
+  .hero-search-btn {
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-crimson);
+    border: none;
+    cursor: pointer;
+    font-size: var(--text-md);
+    transition: background var(--transition-fast);
+  }
+  .hero-search-btn:hover {
+    background: #d63050;
+  }
+  .hero-ctas {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  /* ---- BUTTONS ---- */
+  .btn {
+    display: inline-block;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-md);
     font-weight: 600;
+    font-size: var(--text-base);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    border: 2px solid transparent;
   }
-  .home-nav a:hover {
-    opacity: 0.85;
+  .btn-primary {
+    background: var(--color-crimson);
+    color: white;
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-primary:hover {
+    background: #d63050;
+    transform: translate(-1px, -1px);
+    box-shadow: var(--shadow-md);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border-color: var(--color-gray-400);
+  }
+  .btn-secondary:hover {
+    border-color: var(--color-crimson);
+    color: var(--color-crimson);
+  }
+
+  /* ---- CONTAINER ---- */
+  .container {
+    max-width: var(--container-lg);
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+  }
+
+  /* ---- SECTION SHARED ---- */
+  .section-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    margin: 0 0 var(--space-2);
+  }
+  .section-sub {
+    color: var(--text-secondary);
+    font-size: var(--text-md);
+    margin: 0 0 var(--space-6);
+  }
+
+  /* ---- CATEGORIES ---- */
+  .categories {
+    padding: var(--space-10) 0;
+    background: var(--surface-primary);
+    border-top: 1px solid var(--color-gray-700);
+  }
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+  }
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-4);
+    background: var(--surface-card);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    border: 2px solid var(--color-gray-700);
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+  }
+  .category-card:hover {
+    border-color: var(--color-crimson);
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-md);
+  }
+  .category-icon {
+    font-size: var(--text-3xl);
+  }
+  .category-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: var(--text-md);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+  }
+
+  /* ---- FEATURED SHOPS ---- */
+  .featured-shops {
+    padding: var(--space-12) 0;
+    background: var(--color-gray-800);
+  }
+  .shops-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-5);
+    margin-top: var(--space-6);
+  }
+  .featured-shop-card {
+    background: var(--surface-card);
+    border: 2px solid var(--color-gray-700);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+    display: block;
+  }
+  .featured-shop-card:hover {
+    border-color: var(--color-grip-yellow);
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-md);
+  }
+  .fsc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-2);
+  }
+  .fsc-header h3 {
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    margin: 0;
+    text-transform: uppercase;
+  }
+  .fsc-borough {
+    font-size: var(--text-sm);
+    color: var(--color-grip-yellow);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+  }
+  .fsc-tagline {
+    color: var(--text-secondary);
+    font-style: italic;
+    margin: 0 0 var(--space-2);
+  }
+  .fsc-neighborhood {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin: 0 0 var(--space-3);
+  }
+  .fsc-specialties {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+  .badge {
+    background: var(--color-gray-700);
+    color: var(--text-secondary);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    font-weight: 500;
+  }
+
+  /* ---- MAP PREVIEW ---- */
+  .map-preview {
+    padding: var(--space-12) 0;
+    background: var(--surface-primary);
+    text-align: center;
+  }
+  .map-preview-link {
+    text-decoration: none;
+    display: block;
+    margin-top: var(--space-4);
+  }
+  .map-placeholder {
+    background: var(--surface-card);
+    border: 2px dashed var(--color-gray-600);
+    border-radius: var(--radius-lg);
+    padding: var(--space-10) var(--space-5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    transition: all var(--transition-fast);
+  }
+  .map-placeholder:hover {
+    border-color: var(--color-crimson);
+    background: var(--surface-elevated);
+  }
+  .map-placeholder-icon {
+    font-size: var(--text-4xl);
+  }
+  .map-placeholder-text {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: var(--text-md);
+  }
+
+  /* ---- BOARD OF THE WEEK ---- */
+  .board-of-week {
+    padding: var(--space-12) 0;
+    background: var(--color-gray-800);
+  }
+  .botw-card {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--space-6);
+    background: var(--surface-card);
+    border: 2px solid var(--color-grip-yellow);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin-top: var(--space-6);
+    box-shadow: 0 0 30px rgba(245,197,24,0.1);
+  }
+  .botw-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .botw-placeholder-img {
+    font-size: 6rem;
+    opacity: 0.8;
+  }
+  .botw-info h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-2);
+    text-transform: uppercase;
+  }
+  .botw-price {
+    font-size: var(--text-2xl);
+    color: var(--color-grip-yellow);
+    font-weight: 700;
+    margin: 0 0 var(--space-2);
+  }
+  .botw-shop {
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-3);
+  }
+  .botw-blurb {
+    color: var(--text-secondary);
+    line-height: var(--leading-relaxed);
+    margin: 0 0 var(--space-5);
+  }
+
+  /* ---- ABOUT ---- */
+  .about {
+    padding: var(--space-12) 0;
+    background: var(--surface-primary);
+    text-align: center;
+  }
+  .about-text {
+    max-width: var(--container-md);
+    margin: var(--space-4) auto 0;
+    color: var(--text-secondary);
+    font-size: var(--text-md);
+    line-height: var(--leading-relaxed);
+  }
+
+  /* ---- NEWSLETTER ---- */
+  .newsletter {
+    padding: var(--space-12) 0;
+    background: var(--color-gray-800);
+    text-align: center;
+    border-top: 2px solid var(--color-crimson);
+  }
+  .newsletter-form {
+    display: flex;
+    max-width: 480px;
+    margin: 0 auto;
+    gap: var(--space-3);
+  }
+  .newsletter-input {
+    flex: 1;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-gray-700);
+    color: var(--text-primary);
+    border: 2px solid var(--color-gray-600);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    outline: none;
+    transition: border-color var(--transition-fast);
+  }
+  .newsletter-input:focus {
+    border-color: var(--color-crimson);
+  }
+  .newsletter-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 768px) {
+    .hero {
+      padding: var(--space-10) var(--space-4) var(--space-8);
+    }
+    .hero-headline {
+      font-size: var(--text-2xl);
+    }
+    .category-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .botw-card {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .newsletter-form {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-headline {
+      font-size: var(--text-xl);
+    }
+    .hero-ctas {
+      flex-direction: column;
+      align-items: center;
+    }
+    .shops-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

@@ -1,0 +1,33 @@
+{
+  "hero": {
+    "headline": "Every NYC Skate Shop. One Place.",
+    "subheadline": "Your complete guide to NYC's skateboard scene — shops, gear, events, and more across all five boroughs.",
+    "cta_primary": { "text": "Browse Shops", "href": "/boardroom-nyc/shops/" },
+    "cta_secondary": { "text": "Product Catalog", "href": "/boardroom-nyc/products/" }
+  },
+  "featured_shops": [
+    "labor-skateshop",
+    "homage-brooklyn",
+    "uncle-funkys-boards"
+  ],
+  "board_of_the_week": {
+    "shop_slug": "labor-skateshop",
+    "product_slug": "labor-deck-classic",
+    "blurb": "A timeless classic from one of NYC's most legendary shops. The Labor Classic Logo deck is the real deal — pressed in the USA with premium North American maple."
+  },
+  "categories": [
+    { "name": "Decks", "icon": "🛹", "href": "/boardroom-nyc/products/decks/" },
+    { "name": "Trucks", "icon": "⚙️", "href": "/boardroom-nyc/products/trucks/" },
+    { "name": "Wheels", "icon": "🔴", "href": "/boardroom-nyc/products/wheels/" },
+    { "name": "Apparel", "icon": "👕", "href": "/boardroom-nyc/products/apparel/" }
+  ],
+  "about": {
+    "title": "About Board Room NYC",
+    "text": "Board Room NYC exists to keep NYC's skate shop culture alive. We're not Amazon — we're a directory that connects you directly with the independent shops that make this city's skate scene what it is. Every purchase you make through a local shop supports the community, the riders, and the culture. Shop local. Skate local."
+  },
+  "newsletter": {
+    "heading": "Stay in the Loop",
+    "subheading": "Weekly drops, shop events, and NYC skate news. No spam, ever.",
+    "form_action": ""
+  }
+}
