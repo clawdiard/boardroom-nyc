@@ -1,0 +1,110 @@
+---
+/**
+ * Newsletter signup form — uses Buttondown embed.
+ * Set BUTTONDOWN_USERNAME in data/site.json to activate.
+ * Docs: https://buttondown.email/features/embedding
+ */
+export interface Props {
+  variant?: 'inline' | 'block';
+  heading?: string;
+}
+
+const { variant = 'block', heading = 'Stay in the Loop' } = Astro.props;
+
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+let buttondownUsername = '';
+try {
+  const site = JSON.parse(readFileSync(resolve(process.cwd(), 'data/site.json'), 'utf-8'));
+  buttondownUsername = site.buttondown_username || '';
+} catch { /* site.json not found or missing key */ }
+
+const actionUrl = buttondownUsername
+  ? `https://buttondown.email/api/emails/embed-subscribe/${buttondownUsername}`
+  : '#';
+const isConfigured = !!buttondownUsername;
+---
+
+<div class={`newsletter newsletter--${variant}`}>
+  {variant === 'block' && <h3 class="newsletter__heading">{heading}</h3>}
+  <p class="newsletter__desc">Drop alerts, new arrivals &amp; weekly highlights from NYC's best skate shops.</p>
+  <form
+    action={actionUrl}
+    method="post"
+    target="popupwindow"
+    class="newsletter__form"
+  >
+    <input
+      type="email"
+      name="email"
+      placeholder="your@email.com"
+      required
+      aria-label="Email address"
+      class="newsletter__input"
+    />
+    <button type="submit" class="newsletter__btn" disabled={!isConfigured}>
+      Subscribe 🛹
+    </button>
+    {!isConfigured && <p class="newsletter__note">Coming soon — newsletter setup in progress.</p>}
+  </form>
+</div>
+
+<style>
+  .newsletter { max-width: 480px; }
+  .newsletter--block {
+    background: var(--color-gray-900, #111);
+    border: 1px solid var(--color-gray-700, #333);
+    border-radius: 8px;
+    padding: var(--space-6, 1.5rem);
+    margin: var(--space-6, 1.5rem) 0;
+  }
+  .newsletter__heading {
+    font-family: var(--font-display, sans-serif);
+    font-size: var(--text-lg, 1.125rem);
+    text-transform: uppercase;
+    color: var(--color-crimson, #dc143c);
+    margin: 0 0 var(--space-2, 0.5rem);
+  }
+  .newsletter__desc {
+    font-size: var(--text-sm, 0.875rem);
+    color: var(--text-muted, #999);
+    margin: 0 0 var(--space-4, 1rem);
+  }
+  .newsletter__form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2, 0.5rem);
+  }
+  .newsletter__input {
+    flex: 1 1 200px;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--color-gray-600, #555);
+    border-radius: 4px;
+    background: var(--color-black, #000);
+    color: var(--text-primary, #fff);
+    font-size: var(--text-sm, 0.875rem);
+  }
+  .newsletter__input::placeholder { color: var(--text-muted, #999); }
+  .newsletter__btn {
+    padding: 0.6rem 1.2rem;
+    background: var(--color-crimson, #dc143c);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: var(--text-sm, 0.875rem);
+  }
+  .newsletter__btn:hover { opacity: 0.9; }
+  .newsletter__btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .newsletter__note {
+    width: 100%;
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--text-muted, #999);
+    margin: var(--space-1, 0.25rem) 0 0;
+  }
+</style>

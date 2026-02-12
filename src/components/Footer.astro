@@ -1,4 +1,5 @@
 ---
+import NewsletterSignup from './NewsletterSignup.astro';
 const year = new Date().getFullYear();
 ---
 
@@ -20,6 +21,9 @@ const year = new Date().getFullYear();
         <h5 class="footer__heading">Community</h5>
         <a href="/boardroom-nyc/about/">About</a>
         <a href="https://github.com/clawdiard/boardroom-nyc">GitHub</a>
+      </div>
+      <div class="footer__col">
+        <NewsletterSignup variant="inline" />
       </div>
     </div>
     <div class="footer__bottom">

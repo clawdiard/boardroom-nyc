@@ -1,0 +1,76 @@
+name: Weekly Newsletter
+
+on:
+  schedule:
+    - cron: '0 14 * * 1'  # Every Monday 2PM UTC (10AM ET)
+  workflow_dispatch: {}
+
+jobs:
+  weekly-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate weekly digest
+        run: |
+          WEEK_AGO=$(date -d '7 days ago' +%Y-%m-%d 2>/dev/null || date -v-7d +%Y-%m-%d)
+          echo "# 🛹 Board Room NYC Weekly Digest" > /tmp/weekly.md
+          echo "" >> /tmp/weekly.md
+
+          # New products this week
+          NEW_PRODUCTS=$(git log --since="$WEEK_AGO" --diff-filter=A --name-only --pretty=format: -- 'data/products/' | grep -v '^$' || true)
+          if [ -n "$NEW_PRODUCTS" ]; then
+            echo "## 🆕 New Arrivals" >> /tmp/weekly.md
+            echo "$NEW_PRODUCTS" | while read f; do
+              if [ -f "$f" ]; then
+                NAME=$(jq -r '.name // "Unknown"' "$f")
+                PRICE=$(jq -r '.price // "N/A"' "$f")
+                echo "- **$NAME** — $PRICE" >> /tmp/weekly.md
+              fi
+            done
+            echo "" >> /tmp/weekly.md
+          fi
+
+          # New/updated shops
+          NEW_SHOPS=$(git log --since="$WEEK_AGO" --diff-filter=A --name-only --pretty=format: -- 'data/shops/' | grep -v '^$' || true)
+          if [ -n "$NEW_SHOPS" ]; then
+            echo "## 🏪 New Shops" >> /tmp/weekly.md
+            echo "$NEW_SHOPS" | while read f; do
+              if [ -f "$f" ]; then
+                NAME=$(jq -r '.name // "Unknown"' "$f")
+                HOOD=$(jq -r '.neighborhood // ""' "$f")
+                echo "- **$NAME** — $HOOD" >> /tmp/weekly.md
+              fi
+            done
+            echo "" >> /tmp/weekly.md
+          fi
+
+          # Stats
+          TOTAL_PRODUCTS=$(find data/products -name '*.json' | wc -l)
+          TOTAL_SHOPS=$(find data/shops -name '*.json' | wc -l)
+          echo "## 📊 By the Numbers" >> /tmp/weekly.md
+          echo "- **$TOTAL_SHOPS** shops listed" >> /tmp/weekly.md
+          echo "- **$TOTAL_PRODUCTS** products cataloged" >> /tmp/weekly.md
+          echo "" >> /tmp/weekly.md
+          echo "---" >> /tmp/weekly.md
+          echo "Browse: https://clawdiard.github.io/boardroom-nyc/" >> /tmp/weekly.md
+
+          cat /tmp/weekly.md
+
+      - name: Send weekly newsletter via Buttondown
+        env:
+          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+        run: |
+          if [ -z "$BUTTONDOWN_API_KEY" ]; then
+            echo "⚠️ BUTTONDOWN_API_KEY not set — skipping"
+            exit 0
+          fi
+          SUBJECT="🛹 Board Room NYC Weekly — $(date +%b\ %d)"
+          BODY=$(cat /tmp/weekly.md)
+          curl -s -X POST "https://api.buttondown.email/v1/emails" \
+            -H "Authorization: Token $BUTTONDOWN_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"subject\": \"$SUBJECT\", \"body\": $(echo "$BODY" | jq -Rs .), \"status\": \"draft\"}"
+          echo "✅ Weekly draft created"

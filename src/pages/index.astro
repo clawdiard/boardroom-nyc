@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import ShopCard from '../components/ShopCard.astro';
 import Button from '../components/Button.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -130,6 +131,13 @@ const botwShop = featuredShops.find((s: any) => s.slug === homepage.board_of_the
         <input type="email" name="email" placeholder="your@email.com" required aria-label="Email address" class="newsletter-input" />
         <button type="submit" class="btn btn-primary">Subscribe</button>
       </form>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER SIGNUP -->
+  <section class="newsletter-section">
+    <div class="container">
+      <NewsletterSignup variant="block" heading="Never Miss a Drop" />
     </div>
   </section>
 

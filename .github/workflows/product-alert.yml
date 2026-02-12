@@ -1,0 +1,73 @@
+name: Product Change Alert
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/products/**'
+      - 'data/shops/**'
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed products
+        id: changes
+        run: |
+          ADDED=$(git diff --name-only --diff-filter=A HEAD~1 HEAD -- 'data/products/' | wc -l)
+          MODIFIED=$(git diff --name-only --diff-filter=M HEAD~1 HEAD -- 'data/products/' | wc -l)
+          DELETED=$(git diff --name-only --diff-filter=D HEAD~1 HEAD -- 'data/products/' | wc -l)
+          echo "added=$ADDED" >> "$GITHUB_OUTPUT"
+          echo "modified=$MODIFIED" >> "$GITHUB_OUTPUT"
+          echo "deleted=$DELETED" >> "$GITHUB_OUTPUT"
+
+          # Build human-readable summary
+          SUMMARY=""
+          if [ "$ADDED" -gt 0 ]; then
+            SUMMARY="${SUMMARY}🆕 $ADDED new product(s) added\n"
+            git diff --name-only --diff-filter=A HEAD~1 HEAD -- 'data/products/' | while read f; do
+              NAME=$(jq -r '.name // "Unknown"' "$f" 2>/dev/null || echo "$f")
+              echo "  - $NAME"
+            done >> /tmp/product_summary.txt
+          fi
+          if [ "$MODIFIED" -gt 0 ]; then
+            SUMMARY="${SUMMARY}✏️ $MODIFIED product(s) updated\n"
+          fi
+          if [ "$DELETED" -gt 0 ]; then
+            SUMMARY="${SUMMARY}🗑️ $DELETED product(s) removed\n"
+          fi
+          echo -e "$SUMMARY" > /tmp/change_summary.txt
+          cat /tmp/product_summary.txt >> /tmp/change_summary.txt 2>/dev/null || true
+          echo "has_changes=$( [ $((ADDED + MODIFIED + DELETED)) -gt 0 ] && echo true || echo false )" >> "$GITHUB_OUTPUT"
+
+      - name: Generate newsletter data
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          echo "## 🛹 Board Room NYC — Product Update" > /tmp/newsletter.md
+          echo "" >> /tmp/newsletter.md
+          cat /tmp/change_summary.txt >> /tmp/newsletter.md
+          echo "" >> /tmp/newsletter.md
+          echo "Check it out: https://clawdiard.github.io/boardroom-nyc/products/" >> /tmp/newsletter.md
+          cat /tmp/newsletter.md
+
+      # Buttondown API send (requires BUTTONDOWN_API_KEY secret)
+      - name: Send drop alert via Buttondown
+        if: steps.changes.outputs.has_changes == 'true' && vars.BUTTONDOWN_USERNAME != ''
+        env:
+          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+        run: |
+          if [ -z "$BUTTONDOWN_API_KEY" ]; then
+            echo "⚠️ BUTTONDOWN_API_KEY not set — skipping email send"
+            exit 0
+          fi
+          SUBJECT="🆕 New drops at Board Room NYC!"
+          BODY=$(cat /tmp/newsletter.md)
+          curl -s -X POST "https://api.buttondown.email/v1/emails" \
+            -H "Authorization: Token $BUTTONDOWN_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"subject\": \"$SUBJECT\", \"body\": $(echo "$BODY" | jq -Rs .), \"status\": \"draft\"}"
+          echo "✅ Draft email created in Buttondown"
