@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ProductCard from '../../components/ProductCard.astro';
+import CartButton from '../../components/CartButton.astro';
 import { loadAllProducts, getCategories, getBrands, getShopSlugs, formatPrice } from '../../utils/products';
 
 const products = loadAllProducts();
@@ -122,6 +123,8 @@ const lastUpdated = products.reduce((latest, p) => {
               reserved={p.status === 'reserved'}
               productId={p.id}
               shopSlug={p.shop_slug}
+              shopName={p.shop_slug.replace(/-/g, ' ')}
+              numericPrice={p.price}
             />
             <span class="product-item__shop">{p.shop_slug.replace(/-/g, ' ')}</span>
           </div>
@@ -141,6 +144,7 @@ const lastUpdated = products.reduce((latest, p) => {
       </div>
     </nav>
   </main>
+  <CartButton />
 </Layout>
 
 <script>

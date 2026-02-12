@@ -1,0 +1,30 @@
+---
+// Floating cart button that shows item count via Snipcart
+---
+
+<button class="cart-float snipcart-checkout" aria-label="Shopping cart">
+  🛒 <span class="snipcart-items-count">0</span>
+</button>
+
+<style>
+  .cart-float {
+    position: fixed;
+    bottom: var(--space-6, 24px);
+    right: var(--space-6, 24px);
+    z-index: 999;
+    background: var(--color-grip-yellow, #f0c040);
+    color: #111;
+    border: 2px solid #111;
+    padding: var(--space-3, 12px) var(--space-4, 16px);
+    font-family: var(--font-display, monospace);
+    font-weight: 700;
+    font-size: var(--text-md, 1rem);
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #111;
+    transition: all 0.15s ease;
+  }
+  .cart-float:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 #111;
+  }
+</style>
