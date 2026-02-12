@@ -1,0 +1,52 @@
+name: Inventory Sync
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+    inputs:
+      shop_slug:
+        description: 'Sync a specific shop (leave blank for all)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run inventory sync
+        run: node scripts/inventory-sync.js ${{ github.event.inputs.shop_slug || '' }}
+        env:
+          # Per-shop secrets — add as SHOPIFY_KEY_<SLUG> or SQUARE_TOKEN_<SLUG>
+          # Shopify
+          SHOPIFY_KEY_LABOR_SKATESHOP: ${{ secrets.SHOPIFY_KEY_LABOR_SKATESHOP }}
+          SHOPIFY_KEY_UNCLE_FUNKYS_BOARDS: ${{ secrets.SHOPIFY_KEY_UNCLE_FUNKYS_BOARDS }}
+          SHOPIFY_KEY_HOMAGE_BROOKLYN: ${{ secrets.SHOPIFY_KEY_HOMAGE_BROOKLYN }}
+          # Square
+          SQUARE_TOKEN_LABOR_SKATESHOP: ${{ secrets.SQUARE_TOKEN_LABOR_SKATESHOP }}
+          SQUARE_TOKEN_UNCLE_FUNKYS_BOARDS: ${{ secrets.SQUARE_TOKEN_UNCLE_FUNKYS_BOARDS }}
+          SQUARE_TOKEN_HOMAGE_BROOKLYN: ${{ secrets.SQUARE_TOKEN_HOMAGE_BROOKLYN }}
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "clawdiard"
+          git config user.email "clawdiard@proton.me"
+          git add data/products/
+          if git diff --cached --quiet; then
+            echo "No inventory changes detected"
+          else
+            git commit -m "chore: sync inventory $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push
+          fi
