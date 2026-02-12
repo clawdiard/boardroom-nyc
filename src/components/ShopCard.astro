@@ -13,7 +13,7 @@ interface Props {
 const { name, slug, borough, neighborhood, address, image, specialties = [], isOpen } = Astro.props;
 ---
 
-<a class="shop-card" href={`/shops/${slug}`} data-borough={borough} data-specialties={specialties.join(',')}>
+<a class="shop-card" href={`${import.meta.env.BASE_URL}shops/${slug}/`} data-borough={borough} data-specialties={specialties.join(',')}>
   <div class="shop-card__image">
     {image ? (
       <img src={image} alt={name} loading="lazy" />
