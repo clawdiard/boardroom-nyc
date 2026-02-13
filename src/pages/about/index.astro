@@ -1,0 +1,117 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="About — Board Room NYC" description="Board Room NYC is a community-built directory of every skateboard shop in New York City.">
+  <section class="about-hero">
+    <div class="container">
+      <h1 class="about-hero__title">About Board Room NYC</h1>
+      <p class="about-hero__subtitle">Every NYC skate shop. One place.</p>
+    </div>
+  </section>
+
+  <section class="about-content container">
+    <div class="about-content__grid">
+      <div class="about-content__main">
+        <h2>Our Mission</h2>
+        <p>
+          Board Room NYC is a community-built directory of every skateboard shop in New York City. 
+          We believe local skate shops are the backbone of skate culture — they're where you get your 
+          first deck, hear about the best spots, and connect with the community.
+        </p>
+        <p>
+          Our goal is simple: make it easy to find, explore, and support every skate shop across 
+          all five boroughs. Whether you're a local looking for a new go-to or a visitor trying to 
+          find the closest shop, we've got you covered.
+        </p>
+
+        <h2>What You'll Find</h2>
+        <ul>
+          <li><strong>Shop Directory</strong> — Every skate shop in NYC with hours, location, and what they carry</li>
+          <li><strong>Interactive Map</strong> — Find shops near you across all five boroughs</li>
+          <li><strong>Product Catalog</strong> — Browse decks, trucks, wheels, and gear from local shops</li>
+          <li><strong>Reserve &amp; Pick Up</strong> — Grab gear online and pick it up in-store</li>
+        </ul>
+
+        <h2>Community-Driven</h2>
+        <p>
+          Board Room NYC is open source and community-driven. Shop owners can submit their store 
+          info directly through our GitHub onboarding process. Skaters can suggest updates, report 
+          issues, and help keep the directory accurate.
+        </p>
+        <p>
+          Know a shop we're missing? <a href="https://github.com/clawdiard/boardroom-nyc/issues/new" target="_blank" rel="noopener">Open an issue</a> or submit a pull request — we'd love your help.
+        </p>
+
+        <h2>Built With Grit</h2>
+        <p>
+          Board Room NYC is built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>, 
+          hosted on GitHub Pages, and designed to be fast, accessible, and free. No ads, no paywalls, 
+          no corporate sponsors — just a love letter to NYC skate culture.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .about-hero {
+    background: var(--color-black);
+    border-bottom: 2px solid var(--color-gray-700);
+    padding: var(--space-12) 0 var(--space-8);
+    text-align: center;
+  }
+  .about-hero__title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+    color: var(--text-primary);
+    margin: 0;
+  }
+  .about-hero__subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-muted);
+    margin-top: var(--space-3);
+  }
+  .about-content {
+    padding: var(--space-10) 0;
+  }
+  .about-content__main {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .about-content__main h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+    color: var(--color-crimson);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+  .about-content__main h2:first-child {
+    margin-top: 0;
+  }
+  .about-content__main p {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-4);
+  }
+  .about-content__main ul {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    padding-left: var(--space-5);
+    margin-bottom: var(--space-4);
+  }
+  .about-content__main li {
+    margin-bottom: var(--space-2);
+  }
+  .about-content__main a {
+    color: var(--color-crimson);
+    text-decoration: underline;
+  }
+  .about-content__main a:hover {
+    color: var(--text-primary);
+  }
+</style>
