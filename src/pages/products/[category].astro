@@ -1,7 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ProductCard from '../../components/ProductCard.astro';
-import CartButton from '../../components/CartButton.astro';
 import { loadAllProducts, getCategories, formatPrice } from '../../utils/products';
 
 export function getStaticPaths() {
@@ -79,7 +78,6 @@ const emoji: Record<string, string> = {
 
     <a href={`${base}products/`} class="back-link">← All Products</a>
   </main>
-  <CartButton />
 </Layout>
 
 <style>

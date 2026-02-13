@@ -1,7 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ProductCard from '../../components/ProductCard.astro';
-import CartButton from '../../components/CartButton.astro';
 import { loadAllProducts, getCategories, getBrands, getShopSlugs, formatPrice } from '../../utils/products';
 
 const products = loadAllProducts();
@@ -144,7 +143,6 @@ const lastUpdated = products.reduce((latest, p) => {
       </div>
     </nav>
   </main>
-  <CartButton />
 </Layout>
 
 <script>
