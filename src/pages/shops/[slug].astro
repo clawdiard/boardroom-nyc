@@ -16,7 +16,6 @@ export function getStaticPaths() {
 }
 
 const { shop } = Astro.props;
-const open = isShopOpen(shop.hours);
 const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 const dayLabels: Record<string, string> = {
   monday: 'Mon', tuesday: 'Tue', wednesday: 'Wed', thursday: 'Thu',
@@ -78,8 +77,8 @@ const structuredData = {
       <div class="profile-intro">
         <div class="profile-meta">
           <span class="profile-hood">{shop.neighborhood}, {shop.borough}</span>
-          <span class={`status-badge ${open ? 'status-badge--open' : 'status-badge--closed'}`}>
-            {open ? '● Open Now' : '● Closed'}
+          <span class="status-badge status-badge--closed" id="shop-status-badge" data-hours={JSON.stringify(shop.hours)}>
+            ● Closed
           </span>
         </div>
         <h1 class="profile-name">{shop.name}</h1>
@@ -340,3 +339,27 @@ const structuredData = {
     }
   }
 </style>
+
+<script>
+  const badge = document.getElementById('shop-status-badge');
+  if (badge) {
+    const hours = JSON.parse(badge.getAttribute('data-hours') || '{}');
+    const now = new Date();
+    const et = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+    const todayHours = hours[days[et.getDay()]];
+    let open = false;
+    if (todayHours && todayHours.toLowerCase() !== 'closed') {
+      const parts = todayHours.split('-').map((t: string) => {
+        const [h, m] = t.trim().split(':').map(Number);
+        return h * 60 + m;
+      });
+      if (parts.length >= 2) {
+        const cur = et.getHours() * 60 + et.getMinutes();
+        open = cur >= parts[0] && cur < parts[1];
+      }
+    }
+    badge.textContent = open ? '● Open Now' : '● Closed';
+    badge.className = `status-badge ${open ? 'status-badge--open' : 'status-badge--closed'}`;
+  }
+</script>

@@ -8,23 +8,20 @@ interface Props {
   image?: string;
   specialties?: string[];
   isOpen?: boolean;
+  hours?: Record<string, string>;
 }
 
-const { name, slug, borough, neighborhood, address, image, specialties = [], isOpen } = Astro.props;
+const { name, slug, borough, neighborhood, address, image, specialties = [], hours = {} } = Astro.props;
 ---
 
-<a class="shop-card" href={`${import.meta.env.BASE_URL}shops/${slug}/`} data-borough={borough} data-specialties={specialties.join(',')}>
+<a class="shop-card" href={`${import.meta.env.BASE_URL}shops/${slug}/`} data-borough={borough} data-specialties={specialties.join(',')} data-hours={JSON.stringify(hours)}>
   <div class="shop-card__image">
     {image ? (
       <img src={image} alt={name} loading="lazy" />
     ) : (
       <div class="shop-card__placeholder">🛹</div>
     )}
-    {isOpen !== undefined && (
-      <span class={`shop-card__status ${isOpen ? 'shop-card__status--open' : 'shop-card__status--closed'}`}>
-        {isOpen ? '● Open Now' : '● Closed'}
-      </span>
-    )}
+    <span class="shop-card__status shop-card__status--closed" data-status-badge>● Closed</span>
   </div>
   <div class="shop-card__body">
     <div class="shop-card__meta">
@@ -133,3 +130,35 @@ const { name, slug, borough, neighborhood, address, image, specialties = [], isO
     margin-top: var(--space-3);
   }
 </style>
+
+<script>
+  function isShopOpenNow(hours: Record<string, string>): boolean {
+    const now = new Date();
+    const etStr = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
+    const et = new Date(etStr);
+    const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+    const dayName = days[et.getDay()];
+    const todayHours = hours[dayName];
+    if (!todayHours || todayHours.toLowerCase() === 'closed') return false;
+    const parts = todayHours.split('-').map(t => {
+      const [h, m] = t.trim().split(':').map(Number);
+      return h * 60 + m;
+    });
+    if (parts.length < 2) return false;
+    const cur = et.getHours() * 60 + et.getMinutes();
+    return cur >= parts[0] && cur < parts[1];
+  }
+
+  document.querySelectorAll('.shop-card').forEach(card => {
+    const hoursAttr = card.getAttribute('data-hours');
+    if (!hoursAttr) return;
+    try {
+      const hours = JSON.parse(hoursAttr);
+      const badge = card.querySelector('[data-status-badge]') as HTMLElement;
+      if (!badge) return;
+      const open = isShopOpenNow(hours);
+      badge.textContent = open ? '● Open Now' : '● Closed';
+      badge.className = `shop-card__status ${open ? 'shop-card__status--open' : 'shop-card__status--closed'}`;
+    } catch {}
+  });
+</script>
