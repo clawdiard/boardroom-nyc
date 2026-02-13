@@ -5,11 +5,12 @@ import { loadAllProducts, formatPrice } from '../../utils/products';
 const products = loadAllProducts();
 // Build a lookup map for client-side use
 const productMap = Object.fromEntries(products.map(p => [`${p.shop_slug}/${p.id}`, { name: p.name, brand: p.brand, price: p.price, shop_slug: p.shop_slug, in_stock: p.in_stock, status: p.status || 'available' }]));
+const catalogUrl = `${import.meta.env.BASE_URL}products/`;
 ---
 
 <Layout title="Reserve for Pickup — Board Room NYC" description="Reserve skate gear for in-store pickup with a 24-hour hold.">
   <main class="reserve-page">
-    <a href="/products/" class="back-link">← Back to Catalog</a>
+    <a href={catalogUrl} class="back-link">← Back to Catalog</a>
 
     <h1>🛒 Reserve for Pickup</h1>
     <p class="reserve-page__subtitle">Reserve your gear and pick it up within 24 hours. No payment needed — just show up!</p>
@@ -25,7 +26,7 @@ const productMap = Object.fromEntries(products.map(p => [`${p.shop_slug}/${p.id}
 
     <div id="error-msg" class="reserve-page__error" style="display:none;">
       <p>⚠️ This product is not available for reservation.</p>
-      <a href="/products/">Browse available products</a>
+      <a href={catalogUrl}>Browse available products</a>
     </div>
 
     <form
@@ -61,7 +62,7 @@ const productMap = Object.fromEntries(products.map(p => [`${p.shop_slug}/${p.id}
     <div id="success-msg" class="reserve-page__success" style="display:none;">
       <h2>✅ Reserved!</h2>
       <p>You'll receive a confirmation email shortly. Head to the shop within 24 hours to pick up your gear.</p>
-      <a href="/products/">Continue browsing</a>
+      <a href={catalogUrl}>Continue browsing</a>
     </div>
   </main>
 
