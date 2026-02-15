@@ -5,6 +5,7 @@ export interface Props {
 }
 
 const { slug, shopName } = Astro.props;
+const discussionUrl = `https://github.com/clawdiard/boardroom-nyc/discussions`;
 ---
 
 <section class="reviews-section">
@@ -12,8 +13,7 @@ const { slug, shopName } = Astro.props;
     <h2>Community Reviews</h2>
     <p class="reviews-guidelines">
       Share your experience at {shopName}! Please keep reviews respectful and helpful.
-      Rate the shop, share what you bought, or describe the vibe. 
-      <strong>Sign in with GitHub to comment.</strong>
+      Rate the shop, share what you bought, or describe the vibe.
     </p>
     <div class="guidelines-box">
       <h4>📋 Community Guidelines</h4>
@@ -26,25 +26,13 @@ const { slug, shopName } = Astro.props;
     </div>
   </div>
 
-  <div class="giscus-wrapper">
-    <script
-      src="https://giscus.app/client.js"
-      data-repo="clawdiard/boardroom-nyc"
-      data-repo-id="R_kgDOROUduw"
-      data-category="General"
-      data-category-id="DIC_kwDOROUdu84C2RLF"
-      data-mapping="specific"
-      data-term={`shop-review-${slug}`}
-      data-strict="0"
-      data-reactions-enabled="1"
-      data-emit-metadata="0"
-      data-input-position="top"
-      data-theme="dark_dimmed"
-      data-lang="en"
-      data-loading="lazy"
-      crossorigin="anonymous"
-      async
-    ></script>
+  <div class="reviews-cta">
+    <a href={discussionUrl} target="_blank" rel="noopener noreferrer" class="reviews-button">
+      💬 Join the Discussion on GitHub
+    </a>
+    <p class="reviews-note">
+      Leave a review or read what others are saying about {shopName} in our GitHub Discussions.
+    </p>
   </div>
 </section>
 
@@ -105,7 +93,33 @@ const { slug, shopName } = Astro.props;
     color: var(--color-crimson);
   }
 
-  .giscus-wrapper {
-    min-height: 200px;
+  .reviews-cta {
+    text-align: center;
+    padding: var(--space-6) var(--space-4);
+    background: var(--surface-card);
+    border: 1px solid var(--color-gray-700);
+  }
+
+  .reviews-button {
+    display: inline-block;
+    padding: var(--space-3) var(--space-5);
+    background: var(--color-crimson);
+    color: white;
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: background 0.2s ease;
+  }
+
+  .reviews-button:hover {
+    background: #b91c1c;
+  }
+
+  .reviews-note {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
   }
 </style>
