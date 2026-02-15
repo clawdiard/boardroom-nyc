@@ -74,7 +74,7 @@ const past = allDrops
           <h2 class="drops-section__heading">Upcoming Drops</h2>
           <div class="drops-grid" id="upcomingGrid">
             {upcoming.map((drop: any) => (
-              <div class="drop-card drop-card--upcoming" data-shop={drop.shop || ''} data-brand={drop.brand} data-exclusive={drop.exclusive}>
+              <div class="drop-card drop-card--upcoming" data-shop={drop.shop || ''} data-brand={drop.brand} data-exclusive={drop.exclusive} data-date={drop.date}>
                 <div class="drop-card__date">
                   <span class="drop-card__month">{new Date(drop.date).toLocaleString('en-US', { month: 'short' })}</span>
                   <span class="drop-card__day">{new Date(drop.date).getDate()}</span>
@@ -151,6 +151,33 @@ const past = allDrops
     shopFilter.addEventListener('change', applyFilters);
     brandFilter.addEventListener('change', applyFilters);
     exclFilter.addEventListener('change', applyFilters);
+
+    // Move past drops from Upcoming to Past at runtime (static site fix)
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const upcomingGrid = document.getElementById('upcomingGrid');
+    const pastGrid = document.getElementById('pastGrid');
+    if (upcomingGrid) {
+      upcomingGrid.querySelectorAll('.drop-card--upcoming').forEach(card => {
+        const el = card as HTMLElement;
+        const dropDate = new Date(el.dataset.date + 'T00:00:00');
+        if (dropDate < now) {
+          el.classList.remove('drop-card--upcoming');
+          el.classList.add('drop-card--past');
+          if (pastGrid) {
+            pastGrid.prepend(el);
+          } else {
+            el.style.display = 'none';
+          }
+        }
+      });
+      // Hide empty upcoming section
+      if (upcomingGrid.querySelectorAll('.drop-card').length === 0) {
+        const heading = upcomingGrid.previousElementSibling;
+        if (heading) heading.style.display = 'none';
+        upcomingGrid.style.display = 'none';
+      }
+    }
   </script>
 </Layout>
 
