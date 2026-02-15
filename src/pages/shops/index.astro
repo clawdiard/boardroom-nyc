@@ -94,6 +94,10 @@ const specialties = getSpecialties(shops);
   const grid = document.getElementById('shops-grid')!;
   const emptyMsg = document.getElementById('shops-empty')!;
 
+  // Read search query from URL (?q=...)
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchQuery = (urlParams.get('q') || '').trim().toLowerCase();
+
   function applyFilters() {
     const borough = boroughSelect.value;
     const specialty = specialtySelect.value;
@@ -103,9 +107,11 @@ const specialties = getSpecialties(shops);
     cards.forEach(card => {
       const cardBorough = card.dataset.borough || '';
       const cardSpecs = (card.dataset.specialties || '').split(',');
+      const cardName = (card.querySelector('.shop-card__name')?.textContent || '').toLowerCase();
       const matchBorough = !borough || cardBorough === borough;
       const matchSpecialty = !specialty || cardSpecs.includes(specialty);
-      const show = matchBorough && matchSpecialty;
+      const matchSearch = !searchQuery || cardName.includes(searchQuery) || cardBorough.toLowerCase().includes(searchQuery) || cardSpecs.join(',').toLowerCase().includes(searchQuery);
+      const show = matchBorough && matchSpecialty && matchSearch;
       card.style.display = show ? '' : 'none';
       if (show) visible++;
     });
@@ -122,10 +128,8 @@ const specialties = getSpecialties(shops);
                a.querySelector('.shop-card__name')!.textContent!.localeCompare(b.querySelector('.shop-card__name')!.textContent!);
       }
       if (sortBy === 'newest') {
-        // Reverse DOM order (newest added last in data)
-        return 0; // Keep original for now, could use data attr
+        return 0;
       }
-      // name
       return a.querySelector('.shop-card__name')!.textContent!.localeCompare(b.querySelector('.shop-card__name')!.textContent!);
     });
     cards.forEach(c => grid.appendChild(c));
@@ -135,6 +139,11 @@ const specialties = getSpecialties(shops);
   boroughSelect.addEventListener('change', applyFilters);
   specialtySelect.addEventListener('change', applyFilters);
   sortSelect.addEventListener('change', applySort);
+
+  // Apply filters on load (handles ?q= from homepage search)
+  applyFilters();
+  // Apply on load
+  applyFiltersWithSearch();
 </script>
 
 <style>
