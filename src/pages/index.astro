@@ -186,8 +186,9 @@ const botwShop = featuredShops.find((s: any) => s.slug === homepage.board_of_the
       <p class="section-sub">{homepage.newsletter.subheading}</p>
       <form class="newsletter-form" action={homepage.newsletter.form_action || '#'} method="post">
         <input type="email" name="email" placeholder="your@email.com" required aria-label="Email address" class="newsletter-input" />
-        <button type="submit" class="btn btn-primary">Subscribe</button>
+        <button type="submit" class="btn btn-primary" disabled={!homepage.newsletter.form_action}>Subscribe</button>
       </form>
+      {!homepage.newsletter.form_action && <p class="newsletter-note">Coming soon — newsletter setup in progress.</p>}
     </div>
   </section>
 
@@ -582,6 +583,15 @@ const botwShop = featuredShops.find((s: any) => s.slug === homepage.board_of_the
   }
   .newsletter-input:focus {
     border-color: var(--color-crimson);
+  }
+  .newsletter-note {
+    font-size: 0.75rem;
+    color: var(--text-muted, #999);
+    margin-top: 0.5rem;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
   .newsletter-input::placeholder {
     color: var(--text-muted);
