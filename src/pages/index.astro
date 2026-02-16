@@ -180,22 +180,9 @@ const botwShop = featuredShops.find((s: any) => s.slug === homepage.board_of_the
   </section>
 
   <!-- NEWSLETTER -->
-  <section class="newsletter">
-    <div class="container">
-      <h2 class="section-title">{homepage.newsletter.heading}</h2>
-      <p class="section-sub">{homepage.newsletter.subheading}</p>
-      <form class="newsletter-form" action={homepage.newsletter.form_action || '#'} method="post">
-        <input type="email" name="email" placeholder="your@email.com" required aria-label="Email address" class="newsletter-input" />
-        <button type="submit" class="btn btn-primary" disabled={!homepage.newsletter.form_action}>Subscribe</button>
-      </form>
-      {!homepage.newsletter.form_action && <p class="newsletter-note">Coming soon — newsletter setup in progress.</p>}
-    </div>
-  </section>
-
-  <!-- NEWSLETTER SIGNUP -->
   <section class="newsletter-section">
     <div class="container">
-      <NewsletterSignup variant="block" heading="Never Miss a Drop" />
+      <NewsletterSignup variant="block" heading="Stay in the Loop" />
     </div>
   </section>
 
@@ -558,43 +545,11 @@ const botwShop = featuredShops.find((s: any) => s.slug === homepage.board_of_the
   }
 
   /* ---- NEWSLETTER ---- */
-  .newsletter {
+  .newsletter-section {
     padding: var(--space-12) 0;
     background: var(--color-gray-800);
     text-align: center;
     border-top: 2px solid var(--color-crimson);
-  }
-  .newsletter-form {
-    display: flex;
-    max-width: 480px;
-    margin: 0 auto;
-    gap: var(--space-3);
-  }
-  .newsletter-input {
-    flex: 1;
-    padding: var(--space-3) var(--space-4);
-    background: var(--color-gray-700);
-    color: var(--text-primary);
-    border: 2px solid var(--color-gray-600);
-    border-radius: var(--radius-md);
-    font-size: var(--text-base);
-    outline: none;
-    transition: border-color var(--transition-fast);
-  }
-  .newsletter-input:focus {
-    border-color: var(--color-crimson);
-  }
-  .newsletter-note {
-    font-size: 0.75rem;
-    color: var(--text-muted, #999);
-    margin-top: 0.5rem;
-  }
-  .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  .newsletter-input::placeholder {
-    color: var(--text-muted);
   }
 
   /* ---- RESPONSIVE ---- */
@@ -611,9 +566,6 @@ const botwShop = featuredShops.find((s: any) => s.slug === homepage.board_of_the
     .botw-card {
       grid-template-columns: 1fr;
       text-align: center;
-    }
-    .newsletter-form {
-      flex-direction: column;
     }
   }
 
