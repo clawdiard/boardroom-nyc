@@ -59,6 +59,17 @@ const catalogUrl = `${import.meta.env.BASE_URL}products/`;
       <p class="reserve-form__note">Your reservation will be held for 24 hours. Pick up at the shop or it will be released.</p>
     </form>
 
+    <div id="no-product" class="reserve-page__landing">
+      <h2>🛹 How It Works</h2>
+      <ol>
+        <li><strong>Browse</strong> — Find gear in our <a href={catalogUrl}>product catalog</a></li>
+        <li><strong>Reserve</strong> — Hit the "Reserve for Pickup" button on any in-stock item</li>
+        <li><strong>Pick Up</strong> — Head to the shop within 24 hours to grab your gear</li>
+      </ol>
+      <p class="reserve-page__cta">No payment required online — just show up and pay in store.</p>
+      <a href={catalogUrl} class="reserve-page__browse-btn">Browse Products →</a>
+    </div>
+
     <div id="success-msg" class="reserve-page__success" style="display:none;">
       <h2>✅ Reserved!</h2>
       <p>You'll receive a confirmation email shortly. Head to the shop within 24 hours to pick up your gear.</p>
@@ -77,8 +88,12 @@ const catalogUrl = `${import.meta.env.BASE_URL}products/`;
     const errorMsg = document.getElementById('error-msg');
     const form = document.getElementById('reserve-form');
     const successMsg = document.getElementById('success-msg');
+    const noProduct = document.getElementById('no-product');
 
-    if (product && product.in_stock && product.status !== 'reserved') {
+    if (!productId && !shopSlug) {
+      // No product selected — show landing
+    } else if (product && product.in_stock && product.status !== 'reserved') {
+      noProduct.style.display = 'none';
       // Show product info and form
       document.getElementById('p-brand').textContent = product.brand;
       document.getElementById('p-name').textContent = product.name;
@@ -92,6 +107,7 @@ const catalogUrl = `${import.meta.env.BASE_URL}products/`;
       productInfo.style.display = '';
       form.style.display = '';
     } else {
+      noProduct.style.display = 'none';
       errorMsg.style.display = '';
     }
 
@@ -220,4 +236,39 @@ const catalogUrl = `${import.meta.env.BASE_URL}products/`;
     text-align: center;
   }
   .reserve-page__success a { color: var(--color-grip-yellow); }
+
+  .reserve-page__landing {
+    background: var(--surface-card, #1a1a1a);
+    border: 2px solid var(--color-gray-700, #333);
+    padding: var(--space-6);
+    margin-top: var(--space-4);
+  }
+  .reserve-page__landing h2 { margin-top: 0; }
+  .reserve-page__landing ol {
+    padding-left: var(--space-4);
+    line-height: 2;
+    margin: var(--space-4) 0;
+  }
+  .reserve-page__landing a { color: var(--color-grip-yellow); }
+  .reserve-page__cta {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-4);
+  }
+  .reserve-page__browse-btn {
+    display: inline-block;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-grip-yellow, #f0c040);
+    color: #111;
+    font-family: var(--font-display, monospace);
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 2px solid var(--color-grip-yellow, #f0c040);
+    transition: all 0.15s ease;
+  }
+  .reserve-page__browse-btn:hover {
+    background: transparent;
+    color: var(--color-grip-yellow, #f0c040);
+  }
 </style>
